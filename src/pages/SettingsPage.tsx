@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Mail, ShoppingBag, BarChart3, Share2, Users, Wrench, X, Download, CreditCard } from "lucide-react";
 import AccountSettings from "@/components/settings/AccountSettings";
 import ChiefSettings from "@/components/settings/ChiefSettings";
+import ApiWebhooksSettings from "@/components/settings/ApiWebhooksSettings";
+import NotificationsSettings from "@/components/settings/NotificationsSettings";
 
 const navItems = ["Account", "Team", "Integrations", "Chief Settings", "Billing", "API & Webhooks", "Notifications"];
 
@@ -297,7 +299,11 @@ export default function SettingsPage() {
 
         {activeNav === "Chief Settings" && <ChiefSettings />}
 
-        {!["Team", "Billing", "Integrations", "Account", "Chief Settings"].includes(activeNav) && (
+        {activeNav === "API & Webhooks" && <ApiWebhooksSettings />}
+
+        {activeNav === "Notifications" && <NotificationsSettings />}
+
+        {!["Team", "Billing", "Integrations", "Account", "Chief Settings", "API & Webhooks", "Notifications"].includes(activeNav) && (
           <div>
             <h2 className="text-lg font-bold text-foreground mb-4">{activeNav}</h2>
             <p className="text-sm text-muted-foreground">This section is coming soon.</p>
