@@ -78,8 +78,37 @@ export default function DashboardTopbar() {
               3
             </span>
           </button>
-          <div className="w-7 h-7 rounded-full bg-primary/20 text-primary text-[10px] font-bold flex items-center justify-center">
-            SM
+          <div className="relative" ref={userMenuRef}>
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="w-7 h-7 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center cursor-pointer"
+            >
+              {initials}
+            </button>
+            {showUserMenu && (
+              <div className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-lg shadow-xl z-50 py-1">
+                <div className="px-4 py-2.5 border-b border-border">
+                  <p className="text-xs font-medium text-foreground truncate">{displayName}</p>
+                  <p className="text-[11px] text-muted-foreground truncate">{user?.email}</p>
+                </div>
+                <Link
+                  to="/settings"
+                  onClick={() => setShowUserMenu(false)}
+                  className="flex items-center gap-2 px-4 py-2 text-xs text-foreground hover:bg-muted/50 transition-colors"
+                >
+                  <Settings size={13} />
+                  Account Settings
+                </Link>
+                <div className="border-t border-border my-1" />
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 w-full px-4 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+                >
+                  <LogOut size={13} />
+                  Sign Out
+                </button>
+              </div>
+            )}
           </div>
           {!isMobile && (
             <button onClick={() => navigate("/agents/new")} className="text-xs font-medium bg-primary text-primary-foreground px-3 py-1.5 rounded-md deploy-glow hover:bg-primary/90 transition-colors duration-150">
