@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import {
+import type { LucideIcon } from "lucide-react";
   Search, Bell, Sun, Moon, Menu, X,
   User, Users, CreditCard, Plug,
   Rocket, UserPlus, Key,
