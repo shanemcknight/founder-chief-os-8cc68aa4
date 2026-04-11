@@ -53,7 +53,7 @@ export default function PricingSection() {
             <div
               key={plan.name}
               className={`bg-card border rounded-xl p-6 flex flex-col ${
-                plan.featured ? "border-primary glow-primary relative border-t-2 border-t-primary" : "border-border"
+                plan.featured ? "border-primary glow-primary relative border-t-2 border-t-primary scale-[1.03]" : "border-border"
               }`}
             >
               {plan.badge && (
@@ -82,7 +82,7 @@ export default function PricingSection() {
                     : "border border-border text-foreground hover:bg-muted/50"
                 }`}
               >
-                Get Started
+                {plan.cta}
               </Link>
             </div>
           ))}
