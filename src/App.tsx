@@ -12,6 +12,7 @@ import PublishPage from "./pages/PublishPage";
 import ChiefPage from "./pages/ChiefPage";
 import BuildPage from "./pages/BuildPage";
 import SettingsPage from "./pages/SettingsPage";
+import OnboardingPage from "./pages/OnboardingPage";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<CommandPage />} />
             <Route path="/story" element={<StoryPage />} />
