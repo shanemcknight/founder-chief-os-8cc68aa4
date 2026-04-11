@@ -75,9 +75,9 @@ export default function ChiefPage() {
   };
 
   return (
-    <div className="grid grid-cols-[1fr_2fr_1fr] gap-4 h-full min-h-0">
+    <div className="flex gap-4 h-full min-h-0">
       {/* LEFT — Today's Briefing */}
-      <div className="flex flex-col min-h-0 overflow-y-auto pr-1">
+      <div className="flex flex-col min-h-0 overflow-y-auto pr-1 w-[220px] shrink-0">
         <div className="mb-4">
           <h2 className="text-sm font-bold text-foreground">April 11, 2026</h2>
           <p className="text-xs text-muted-foreground">Good morning, Shane.</p>
@@ -111,7 +111,7 @@ export default function ChiefPage() {
       </div>
 
       {/* CENTER — Chat */}
-      <div className="flex flex-col min-h-0 border-x border-border px-4">
+      <div className="flex flex-col min-h-0 flex-1 border-x border-border px-4 min-w-0">
         <h2 className="text-sm font-bold text-foreground mb-3">Ask Chief Anything</h2>
         <div className="flex-1 overflow-y-auto space-y-3 mb-3">
           {chatMessages.map((msg, i) => (
@@ -135,7 +135,7 @@ export default function ChiefPage() {
       </div>
 
       {/* RIGHT — Live Activity Feed */}
-      <div className="flex flex-col min-h-0 pl-1">
+      <div className="flex flex-col min-h-0 pl-1 w-[200px] shrink-0">
         <div className="flex items-center gap-2 mb-3">
           <h2 className="text-sm font-bold text-foreground">Live Activity</h2>
           <span className="relative flex h-2 w-2">
