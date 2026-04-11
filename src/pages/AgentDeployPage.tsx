@@ -79,7 +79,7 @@ export default function AgentDeployPage() {
                 style={{
                   left: `${Math.random() * 100}%`,
                   top: `-${Math.random() * 20}%`,
-                  backgroundColor: ["#B54165", "#F59E0B", "#10B981", "#3B82F6", "#8B5CF6"][i % 5],
+                  backgroundColor: ["#5D9992", "#F59E0B", "#10B981", "#3B82F6", "#8B5CF6"][i % 5],
                   animationDelay: `${Math.random() * 2}s`,
                   animationDuration: `${1 + Math.random() * 2}s`,
                 }}
