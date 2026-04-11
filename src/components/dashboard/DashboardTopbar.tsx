@@ -18,7 +18,7 @@ export default function DashboardTopbar() {
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
-            placeholder="Search anything..."
+            placeholder="Search agents, logs, contacts..."
             className="w-full text-xs bg-background border border-border rounded-md pl-9 pr-3 py-1.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>

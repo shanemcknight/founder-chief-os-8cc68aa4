@@ -2,30 +2,27 @@ import { useState } from "react";
 
 const priorities = [
   {
-    summary: "Wholesale inquiry from Austin bar owner — response drafted",
+    summary: "Wholesale inquiry — Austin bar owner. Response drafted.",
     actions: ["Approve", "Edit"],
-    id: 1,
   },
   {
-    summary: "LinkedIn post ready to publish",
+    summary: "LinkedIn post ready to publish — scheduled 2pm",
     actions: ["Approve", "Edit"],
-    id: 2,
   },
   {
-    summary: "Invoice #1042 overdue $840",
+    summary: "Invoice #1042 overdue — $840 outstanding",
     actions: ["View", "Dismiss"],
-    id: 3,
   },
 ];
 
 const mockChat = [
   {
     role: "user" as const,
-    text: "What should I focus on today?",
+    text: "What's the most urgent thing today?",
   },
   {
     role: "chief" as const,
-    text: "Three things: approve the wholesale reply sitting in inbox, fix that Amazon listing before it costs you rank, and sign off on tomorrow's LinkedIn post. Everything else is handled.",
+    text: "The Austin wholesale inquiry. Bar owner asked about BIB pricing. I've drafted a response — approve it and it goes out in your voice. Want me to also add them to the CRM pipeline?",
   },
 ];
 
@@ -46,11 +43,8 @@ export default function ChiefPanel() {
             Today's Priorities
           </p>
           <div className="space-y-2">
-            {priorities.map((item) => (
-              <div
-                key={item.id}
-                className="bg-background/50 border border-border rounded-lg p-2.5"
-              >
+            {priorities.map((item, i) => (
+              <div key={i} className="bg-background/50 border border-border rounded-lg p-2.5">
                 <p className="text-xs text-foreground leading-relaxed mb-2">
                   {item.summary}
                 </p>
@@ -69,7 +63,7 @@ export default function ChiefPanel() {
 
         <div className="border-t border-border" />
 
-        {/* Mini Chat */}
+        {/* Chat */}
         <div>
           <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
             Chat

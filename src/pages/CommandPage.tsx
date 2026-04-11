@@ -5,30 +5,38 @@ import {
   CreditCard,
   Calculator,
   BarChart3,
+  ArrowUpRight,
+  Minus,
 } from "lucide-react";
 
 const kpis = [
-  { label: "Revenue Today", value: "$4,840", barColor: "bg-accent" },
-  { label: "Active Agents", value: "7", barColor: "bg-primary" },
-  { label: "Emails Pending", value: "3", barColor: "bg-primary" },
-  { label: "Social Reach", value: "12.4K", barColor: "bg-success" },
+  { label: "Revenue Today", value: "$4,840", barColor: "bg-accent", trend: "+12%", up: true },
+  { label: "Active Agents", value: "7", barColor: "bg-primary", trend: "Stable", up: false },
+  { label: "Emails Pending", value: "3", barColor: "bg-primary", trend: "+2 new", up: true },
+  { label: "Social Reach", value: "12.4K", barColor: "bg-success", trend: "+18%", up: true },
 ];
 
 const tools = [
   { name: "Shopify", icon: ShoppingBag, metrics: ["$4,840 today", "23 orders", "2 flagged"] },
   { name: "Amazon", icon: Package, metrics: ["$2,210 today", "18 orders", "1 suppressed listing"] },
-  { name: "Klaviyo", icon: MailOpen, metrics: ["38.2% open rate", "1 campaign live"] },
-  { name: "Stripe", icon: CreditCard, metrics: ["$1,630 today", "0 failed payments"] },
-  { name: "QuickBooks", icon: Calculator, metrics: ["$4,200 outstanding", "2 invoices due"] },
-  { name: "Google Analytics", icon: BarChart3, metrics: ["1,842 sessions", "3.4% conversion"] },
+  { name: "Klaviyo", icon: MailOpen, metrics: ["38.2% open rate", "1 campaign live", "3,068 subscribers"] },
+  { name: "Stripe", icon: CreditCard, metrics: ["$1,630 today", "0 failed payments", "14 active subscriptions"] },
+  { name: "QuickBooks", icon: Calculator, metrics: ["$4,200 outstanding", "2 invoices due", "Next payroll Friday"] },
+  { name: "Google Analytics", icon: BarChart3, metrics: ["1,842 sessions", "3.4% conversion", "+18% vs last week"] },
 ];
 
+const priorityBadgeClass: Record<string, string> = {
+  HIGH: "bg-destructive/15 text-destructive",
+  MED: "bg-warning/15 text-warning",
+  FYI: "bg-muted text-muted-foreground",
+};
+
 const actions = [
-  { text: "Wholesale lead email — Barrel & Oak, Austin TX", btn: "Reply" },
-  { text: "Amazon suppressed listing — Smoked Maple Old Fashioned", btn: "Review" },
-  { text: "Invoice #1042 overdue — $840 from Barrel & Oak", btn: "Pay" },
-  { text: "LinkedIn post scheduled for today — Q2 milestones", btn: "Preview" },
-  { text: "Agent Cipher has errors — failed 3 tasks overnight", btn: "Fix" },
+  { priority: "HIGH", text: "Wholesale lead email from Austin — Barrel & Oak", btn: "Reply" },
+  { priority: "HIGH", text: "Amazon listing suppressed: Ginger Beer BIB", btn: "Review" },
+  { priority: "MED", text: "Invoice #1042 overdue $840", btn: "Pay Now" },
+  { priority: "MED", text: "LinkedIn post scheduled for today, not yet approved", btn: "Preview" },
+  { priority: "FYI", text: "Agent Cipher has 3 consecutive errors", btn: "Fix" },
 ];
 
 export default function CommandPage() {
@@ -36,8 +44,8 @@ export default function CommandPage() {
     <div className="space-y-6">
       {/* Welcome */}
       <div>
-        <h1 className="text-xl font-bold text-foreground">Good morning, Shane.</h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <h1 className="text-[22px] font-bold text-foreground">Good morning, Shane.</h1>
+        <p className="text-[13px] text-muted-foreground mt-1">
           7 agents active · 3 items need your attention · Last action 12 min ago
         </p>
       </div>
@@ -47,8 +55,18 @@ export default function CommandPage() {
         {kpis.map((kpi) => (
           <div key={kpi.label} className="bg-card border border-border rounded-xl p-4 relative overflow-hidden">
             <div className={`absolute top-0 left-0 right-0 h-[3px] ${kpi.barColor}`} />
-            <p className="text-xs text-muted-foreground mb-1">{kpi.label}</p>
-            <p className="text-2xl font-bold text-foreground">{kpi.value}</p>
+            <p className="text-[11px] text-muted-foreground mb-1">{kpi.label}</p>
+            <p className="text-[22px] font-bold text-foreground">{kpi.value}</p>
+            <div className="flex items-center gap-1 mt-1">
+              {kpi.up ? (
+                <ArrowUpRight size={10} className="text-success" />
+              ) : (
+                <Minus size={10} className="text-muted-foreground" />
+              )}
+              <span className={`text-[10px] ${kpi.up ? "text-success" : "text-muted-foreground"}`}>
+                {kpi.trend}
+              </span>
+            </div>
           </div>
         ))}
       </div>
@@ -90,7 +108,12 @@ export default function CommandPage() {
               key={i}
               className="flex items-center justify-between bg-card border border-border rounded-lg p-3"
             >
-              <p className="text-sm text-foreground">{a.text}</p>
+              <div className="flex items-center gap-3 min-w-0">
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${priorityBadgeClass[a.priority]}`}>
+                  {a.priority}
+                </span>
+                <p className="text-sm text-foreground truncate">{a.text}</p>
+              </div>
               <button className="text-xs font-medium bg-primary text-primary-foreground px-3 py-1.5 rounded hover:bg-[#9a2f4d] transition-colors duration-150 shrink-0 ml-3">
                 {a.btn}
               </button>
