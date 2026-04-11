@@ -97,7 +97,13 @@ export default function DashboardSidebar() {
 
       <div className="p-3 border-t border-border">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+          <div
+            className="w-8 h-8 rounded-full text-xs font-bold flex items-center justify-center text-white"
+            style={{
+              background: "linear-gradient(135deg, #5D9992, #4d8880)",
+              boxShadow: "0 0 0 2px #1A1D21, 0 0 0 4px #5D9992, 0 0 12px rgba(93,153,146,0.35)",
+            }}
+          >
             {initials}
           </div>
           <div className="flex-1 min-w-0">
