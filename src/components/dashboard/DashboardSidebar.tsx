@@ -73,7 +73,7 @@ export default function DashboardSidebar() {
 
       <div className="p-3 border-t border-border">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-purple-600/20 text-purple-400 text-xs font-bold flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
             SM
           </div>
           <div className="flex-1 min-w-0">
