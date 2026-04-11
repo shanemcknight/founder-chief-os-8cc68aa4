@@ -227,7 +227,7 @@ export default function DashboardTopbar() {
   );
 }
 
-function MenuItem({ icon: Icon, label, onClick }: { icon: React.ComponentType<{ size?: number; className?: string }>; label: string; onClick: () => void }) {
+function MenuItem({ icon: Icon, label, onClick }: { icon: LucideIcon; label: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
