@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 
 const stepLabels = ["Account", "Business", "Connect", "Agent", "Meet Chief"];
 
@@ -166,7 +167,14 @@ export default function OnboardingPage() {
             >
               {signupLoading ? "Creating account..." : "Continue →"}
             </button>
-            <p className="text-center text-xs text-muted-foreground">
+            <div className="relative my-5">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
+              <div className="relative flex justify-center text-xs"><span className="bg-background px-2 text-muted-foreground">or</span></div>
+            </div>
+
+            <GoogleSignInButton />
+
+            <p className="text-center text-xs text-muted-foreground mt-4">
               Already have an account?{" "}
               <span onClick={() => navigate("/login")} className="text-primary cursor-pointer hover:underline">Log in</span>
             </p>
