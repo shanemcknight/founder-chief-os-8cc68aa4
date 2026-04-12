@@ -199,7 +199,13 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     setPosts(prev => prev.map(p => (p.id === id ? { ...p, ...updates } : p)));
 
     // Map app fields to DB columns
-    const dbUpdates: Record<string, any> = {};
+    const dbUpdates: Partial<{
+      title: string; caption: string; hashtags: string; platforms: string[];
+      post_types: Record<string, string>; status: string; scheduled_date: string | null;
+      scheduled_time: string | null; media_url: string; alt_text: string;
+      first_comment: string; content_pillar: string | null; boost_enabled: boolean;
+      boost_budget: number;
+    }> = {};
     if (updates.title !== undefined) dbUpdates.title = updates.title;
     if (updates.caption !== undefined) dbUpdates.caption = updates.caption;
     if (updates.hashtags !== undefined) dbUpdates.hashtags = updates.hashtags;
