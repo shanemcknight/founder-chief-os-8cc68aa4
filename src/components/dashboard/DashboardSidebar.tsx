@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
+import { useState } from "react";
 import {
   LayoutDashboard,
   BookOpen,
@@ -10,12 +11,20 @@ import {
   Settings,
   PlusCircle,
   LogOut,
+  Calendar,
+  ShieldCheck,
+  LayoutGrid,
+  Library,
+  BarChart3,
+  Lightbulb,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 
-const navItems = [
+const mainNavItems = [
   { label: "COMMAND", path: "/dashboard", icon: LayoutDashboard },
-  { label: "SOCIAL", path: "/social", icon: BookOpen },
   { label: "SALES", path: "/sales", icon: Target },
   { label: "INBOX", path: "/inbox", icon: Mail },
   { label: "PUBLISH", path: "/publish", icon: FileText },
@@ -23,9 +32,28 @@ const navItems = [
   { label: "BUILD", path: "/build", icon: Wrench },
 ];
 
+const socialSubItems = [
+  { label: "Calendar", path: "/social/calendar", icon: Calendar },
+  { label: "Approvals", path: "/social/approvals", icon: ShieldCheck },
+  { label: "Pipeline", path: "/social/pipeline", icon: LayoutGrid },
+  { label: "Library", path: "/social/library", icon: Library },
+  { label: "Performance", path: "/social/performance", icon: BarChart3 },
+  { label: "Strategy", path: "/social/strategy", icon: Lightbulb },
+];
+
+const linkClass = (isActive: boolean) =>
+  `flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors duration-150 ${
+    isActive
+      ? "text-primary bg-primary/10 border-l-2 border-primary -ml-[2px] pl-[14px]"
+      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+  }`;
+
 export default function DashboardSidebar() {
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
+
+  const isSocialActive = location.pathname.startsWith("/social");
+  const [socialOpen, setSocialOpen] = useState(isSocialActive);
 
   const displayName = profile?.full_name || user?.email?.split("@")[0] || "User";
   const initials = displayName
@@ -34,6 +62,9 @@ export default function DashboardSidebar() {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  // Keep social expanded when active
+  const showSocialSub = socialOpen || isSocialActive;
 
   return (
     <aside className="w-[220px] shrink-0 border-r border-border bg-card flex flex-col overflow-y-auto">
@@ -46,22 +77,57 @@ export default function DashboardSidebar() {
       </div>
 
       <nav className="flex-1 py-1 px-2 space-y-0.5">
-        {navItems.map((item) => {
+        {/* COMMAND */}
+        <NavLink to="/dashboard" className={linkClass(location.pathname === "/dashboard")}>
+          <LayoutDashboard size={16} />
+          COMMAND
+        </NavLink>
+
+        {/* SOCIAL — expandable */}
+        <button
+          onClick={() => setSocialOpen(!showSocialSub)}
+          className={cn(
+            "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors duration-150",
+            isSocialActive
+              ? "text-primary bg-primary/10"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          )}
+        >
+          <BookOpen size={16} />
+          <span className="flex-1 text-left">SOCIAL</span>
+          {showSocialSub ? <ChevronDown size={14} className="opacity-50" /> : <ChevronRight size={14} className="opacity-50" />}
+        </button>
+
+        {showSocialSub && (
+          <div className="ml-3 pl-3 border-l border-border/40 space-y-0.5 py-1">
+            {socialSubItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={cn(
+                    "flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[13px] transition-colors duration-150",
+                    isActive
+                      ? "text-primary bg-primary/10 font-medium"
+                      : "text-muted-foreground/70 hover:text-foreground hover:bg-muted/30"
+                  )}
+                >
+                  <Icon size={14} />
+                  {item.label}
+                </NavLink>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Rest of main nav */}
+        {mainNavItems.slice(1).map((item) => {
           const Icon = item.icon;
-          const isActive =
-            item.path === "/dashboard"
-              ? location.pathname === "/dashboard"
-              : location.pathname.startsWith(item.path);
+          const isActive = location.pathname.startsWith(item.path);
           return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors duration-150 ${
-                isActive
-                  ? "text-primary bg-primary/10 border-l-2 border-primary -ml-[2px] pl-[14px]"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              }`}
-            >
+            <NavLink key={item.path} to={item.path} className={linkClass(isActive)}>
               <Icon size={16} />
               {item.label}
             </NavLink>
@@ -70,26 +136,12 @@ export default function DashboardSidebar() {
 
         <div className="border-t border-border my-3" />
 
-        <NavLink
-          to="/agents/new"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors duration-150 ${
-            location.pathname === "/agents/new"
-              ? "text-primary bg-primary/10 border-l-2 border-primary -ml-[2px] pl-[14px]"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-          }`}
-        >
+        <NavLink to="/agents/new" className={linkClass(location.pathname === "/agents/new")}>
           <PlusCircle size={16} />
           Deploy New
         </NavLink>
 
-        <NavLink
-          to="/settings"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors duration-150 ${
-            location.pathname === "/settings"
-              ? "text-primary bg-primary/10 border-l-2 border-primary -ml-[2px] pl-[14px]"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-          }`}
-        >
+        <NavLink to="/settings" className={linkClass(location.pathname === "/settings")}>
           <Settings size={16} />
           Settings
         </NavLink>
@@ -111,11 +163,7 @@ export default function DashboardSidebar() {
             <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
             <p className="text-[10px] text-muted-foreground truncate">{user?.email}</p>
           </div>
-          <button
-            onClick={signOut}
-            className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
-            title="Log out"
-          >
+          <button onClick={signOut} className="text-muted-foreground hover:text-foreground transition-colors shrink-0" title="Log out">
             <LogOut size={14} />
           </button>
         </div>
