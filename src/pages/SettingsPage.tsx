@@ -257,6 +257,9 @@ export default function SettingsPage() {
               <h2 className="text-lg font-bold text-foreground">Integrations</h2>
               <span className="text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 px-2 py-0.5 rounded">8 connected</span>
             </div>
+
+            <EmailIntegrationSettings />
+
             <div className="mb-6">
               <h3 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Connected</h3>
               <div className="grid grid-cols-4 gap-2">
