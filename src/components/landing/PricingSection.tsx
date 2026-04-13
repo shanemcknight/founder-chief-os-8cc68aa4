@@ -75,7 +75,7 @@ export default function PricingSection() {
                 ))}
               </ul>
               <Link
-                to="/onboarding"
+                to="/pricing"
                 className={`text-sm font-medium text-center py-2.5 rounded-md transition-opacity duration-150 ${
                   plan.featured
                     ? "bg-primary text-primary-foreground hover:opacity-90"
