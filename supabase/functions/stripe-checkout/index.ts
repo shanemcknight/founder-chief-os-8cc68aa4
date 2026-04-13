@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { corsHeaders } from "https://deno.land/x/supabase_functions_js@v2.4.3/src/cors.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY")!;
