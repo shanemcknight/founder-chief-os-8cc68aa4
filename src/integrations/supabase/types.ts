@@ -193,6 +193,7 @@ export type Database = {
       profiles: {
         Row: {
           anthropic_api_key: string | null
+          approved: boolean
           business_name: string | null
           created_at: string
           full_name: string | null
@@ -202,6 +203,7 @@ export type Database = {
         }
         Insert: {
           anthropic_api_key?: string | null
+          approved?: boolean
           business_name?: string | null
           created_at?: string
           full_name?: string | null
@@ -211,6 +213,7 @@ export type Database = {
         }
         Update: {
           anthropic_api_key?: string | null
+          approved?: boolean
           business_name?: string | null
           created_at?: string
           full_name?: string | null
