@@ -19,18 +19,15 @@ import {
   Lightbulb,
   ChevronDown,
   ChevronRight,
+  Inbox,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  Activity,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-
-const mainNavItems = [
-  { label: "COMMAND", path: "/dashboard", icon: LayoutDashboard },
-  { label: "SALES", path: "/sales", icon: Target },
-  { label: "INBOX", path: "/inbox", icon: Mail },
-  { label: "PUBLISH", path: "/publish", icon: FileText },
-  { label: "CHIEF", path: "/chief", icon: Brain },
-  { label: "BUILD", path: "/build", icon: Wrench },
-];
+import { useInboxCounts } from "@/hooks/useInboxCounts";
 
 const socialSubItems = [
   { label: "Calendar", path: "/social/calendar", icon: Calendar },
@@ -39,6 +36,21 @@ const socialSubItems = [
   { label: "Library", path: "/social/library", icon: Library },
   { label: "Performance", path: "/social/performance", icon: BarChart3 },
   { label: "Strategy", path: "/social/strategy", icon: Lightbulb },
+];
+
+const inboxSubItems = [
+  { label: "Mail", path: "/inbox/mail", icon: Mail, countKey: "mail" as const },
+  { label: "Approvals", path: "/inbox/approvals", icon: CheckCircle2, countKey: "approvals" as const },
+  { label: "Queue", path: "/inbox/queue", icon: Clock, countKey: "queue" as const, amber: true },
+  { label: "Alerts", path: "/inbox/alerts", icon: AlertTriangle, countKey: "alerts" as const },
+  { label: "Activity", path: "/inbox/activity", icon: Activity, countKey: null },
+];
+
+const mainNavAfterInbox = [
+  { label: "SALES", path: "/sales", icon: Target },
+  { label: "PUBLISH", path: "/publish", icon: FileText },
+  { label: "CHIEF", path: "/chief", icon: Brain },
+  { label: "BUILD", path: "/build", icon: Wrench },
 ];
 
 const linkClass = (isActive: boolean) =>
@@ -51,9 +63,12 @@ const linkClass = (isActive: boolean) =>
 export default function DashboardSidebar() {
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
+  const inboxCounts = useInboxCounts();
 
   const isSocialActive = location.pathname.startsWith("/social");
+  const isInboxActive = location.pathname.startsWith("/inbox");
   const [socialOpen, setSocialOpen] = useState(isSocialActive);
+  const [inboxOpen, setInboxOpen] = useState(isInboxActive);
 
   const displayName = profile?.full_name || user?.email?.split("@")[0] || "User";
   const initials = displayName
@@ -63,8 +78,8 @@ export default function DashboardSidebar() {
     .toUpperCase()
     .slice(0, 2);
 
-  // Keep social expanded when active
   const showSocialSub = socialOpen || isSocialActive;
+  const showInboxSub = inboxOpen || isInboxActive;
 
   return (
     <aside className="w-[220px] shrink-0 border-r border-border bg-card flex flex-col overflow-y-auto">
@@ -82,6 +97,63 @@ export default function DashboardSidebar() {
           <LayoutDashboard size={16} />
           COMMAND
         </NavLink>
+
+        {/* INBOX — expandable */}
+        <button
+          onClick={() => setInboxOpen(!showInboxSub)}
+          className={cn(
+            "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors duration-150",
+            isInboxActive
+              ? "text-[#B54165] bg-[#B54165]/10"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          )}
+        >
+          <Inbox size={16} />
+          <span className="flex-1 text-left">INBOX</span>
+          {inboxCounts.total > 0 && (
+            <span className="text-[9px] font-bold bg-destructive text-white px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+              {inboxCounts.total}
+            </span>
+          )}
+          {showInboxSub ? <ChevronDown size={14} className="opacity-50" /> : <ChevronRight size={14} className="opacity-50" />}
+        </button>
+
+        {showInboxSub && (
+          <div className="ml-3 pl-3 border-l border-border/40 space-y-0.5 py-1">
+            {inboxSubItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              const count = item.countKey ? inboxCounts[item.countKey] : 0;
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={cn(
+                    "flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[13px] transition-colors duration-150",
+                    isActive
+                      ? "text-[#B54165] bg-[#B54165]/10 font-medium border-l-2 border-[#B54165] -ml-[2px] pl-[10px]"
+                      : "text-muted-foreground/70 hover:text-foreground hover:bg-muted/30"
+                  )}
+                >
+                  <Icon size={14} />
+                  <span className="flex-1">{item.label}</span>
+                  {count > 0 && (
+                    <span
+                      className={cn(
+                        "text-[9px] font-bold px-1.5 py-0.5 rounded-full min-w-[16px] text-center",
+                        item.amber
+                          ? "bg-[hsl(var(--warning))]/15 text-[hsl(var(--warning))]"
+                          : "bg-destructive/15 text-destructive"
+                      )}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </NavLink>
+              );
+            })}
+          </div>
+        )}
 
         {/* SOCIAL — expandable */}
         <button
@@ -123,7 +195,7 @@ export default function DashboardSidebar() {
         )}
 
         {/* Rest of main nav */}
-        {mainNavItems.slice(1).map((item) => {
+        {mainNavAfterInbox.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname.startsWith(item.path);
           return (

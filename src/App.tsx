@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -8,7 +8,6 @@ import NotFound from "./pages/NotFound";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 import CommandPage from "./pages/CommandPage";
 import SalesPage from "./pages/SalesPage";
-import InboxPage from "./pages/InboxPage";
 import PublishPage from "./pages/PublishPage";
 import ChiefPage from "./pages/ChiefPage";
 import BuildPage from "./pages/BuildPage";
@@ -29,6 +28,14 @@ import SocialPipelinePage from "./pages/social/SocialPipelinePage";
 import SocialLibraryPage from "./pages/social/SocialLibraryPage";
 import SocialPerformancePage from "./pages/social/SocialPerformancePage";
 import SocialStrategyPage from "./pages/social/SocialStrategyPage";
+
+// Inbox sub-pages
+import InboxLayout from "./pages/inbox/InboxLayout";
+import InboxMailPage from "./pages/inbox/InboxMailPage";
+import InboxApprovalsPage from "./pages/inbox/InboxApprovalsPage";
+import InboxQueuePage from "./pages/inbox/InboxQueuePage";
+import InboxAlertsPage from "./pages/inbox/InboxAlertsPage";
+import InboxActivityPage from "./pages/inbox/InboxActivityPage";
 
 const queryClient = new QueryClient();
 
@@ -56,8 +63,15 @@ const App = () => (
                 <Route path="performance" element={<SocialPerformancePage />} />
                 <Route path="strategy" element={<SocialStrategyPage />} />
               </Route>
+              <Route path="/inbox" element={<InboxLayout />}>
+                <Route index element={<Navigate to="/inbox/mail" replace />} />
+                <Route path="mail" element={<InboxMailPage />} />
+                <Route path="approvals" element={<InboxApprovalsPage />} />
+                <Route path="queue" element={<InboxQueuePage />} />
+                <Route path="alerts" element={<InboxAlertsPage />} />
+                <Route path="activity" element={<InboxActivityPage />} />
+              </Route>
               <Route path="/sales" element={<SalesPage />} />
-              <Route path="/inbox" element={<InboxPage />} />
               <Route path="/publish" element={<PublishPage />} />
               <Route path="/chief" element={<ChiefPage />} />
               <Route path="/build" element={<BuildPage />} />

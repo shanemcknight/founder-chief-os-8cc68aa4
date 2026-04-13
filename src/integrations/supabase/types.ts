@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_log: {
+        Row: {
+          action_type: string | null
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          action_type?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       beta_waitlist: {
         Row: {
           business_type: string
@@ -35,6 +62,131 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+        }
+        Relationships: []
+      }
+      email_drafts: {
+        Row: {
+          created_at: string
+          draft_body: string | null
+          email_id: string | null
+          id: string
+          sent_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          draft_body?: string | null
+          email_id?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          draft_body?: string | null
+          email_id?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_drafts_email_id_fkey"
+            columns: ["email_id"]
+            isOneToOne: false
+            referencedRelation: "emails"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emails: {
+        Row: {
+          archived: boolean
+          body_full: string | null
+          body_preview: string | null
+          category: string
+          chief_summary: string | null
+          created_at: string
+          external_id: string | null
+          from_email: string | null
+          from_name: string | null
+          id: string
+          provider: string | null
+          read: boolean
+          received_at: string | null
+          starred: boolean
+          subject: string | null
+          user_id: string
+        }
+        Insert: {
+          archived?: boolean
+          body_full?: string | null
+          body_preview?: string | null
+          category?: string
+          chief_summary?: string | null
+          created_at?: string
+          external_id?: string | null
+          from_email?: string | null
+          from_name?: string | null
+          id?: string
+          provider?: string | null
+          read?: boolean
+          received_at?: string | null
+          starred?: boolean
+          subject?: string | null
+          user_id: string
+        }
+        Update: {
+          archived?: boolean
+          body_full?: string | null
+          body_preview?: string | null
+          category?: string
+          chief_summary?: string | null
+          created_at?: string
+          external_id?: string | null
+          from_email?: string | null
+          from_name?: string | null
+          id?: string
+          provider?: string | null
+          read?: boolean
+          received_at?: string | null
+          starred?: boolean
+          subject?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string
+          id: string
+          message: string | null
+          read: boolean
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          read?: boolean
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          read?: boolean
+          type?: string | null
+          user_id?: string
         }
         Relationships: []
       }
