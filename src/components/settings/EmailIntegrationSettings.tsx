@@ -39,6 +39,7 @@ export default function EmailIntegrationSettings() {
     if (!user) return;
     setConnecting(true);
     try {
+      const { default: Nango } = await import("@nangohq/frontend");
       const nango = new Nango({ publicKey: NANGO_PUBLIC_KEY });
       const result = await nango.auth("microsoft-outlook", user.id);
 
