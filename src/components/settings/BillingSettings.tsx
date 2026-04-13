@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
-import { Zap, CreditCard, ExternalLink } from "lucide-react";
+import { Zap, CreditCard, ExternalLink, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 const PLAN_LABELS: Record<string, string> = {
   scout: "SCOUT",
@@ -24,8 +25,28 @@ function formatTokens(n: number): string {
 }
 
 export default function BillingSettings() {
-  const { subscription, isLoading } = useSubscription();
+  const { subscription, isLoading, refetch } = useSubscription();
   const [portalLoading, setPortalLoading] = useState(false);
+  const [syncLoading, setSyncLoading] = useState(false);
+
+  const handleSyncPlan = async () => {
+    setSyncLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("verify-subscription");
+      if (error) throw error;
+      if (data?.verified) {
+        toast.success(`Plan synced: ${(data.plan || "").toUpperCase()}`);
+      } else {
+        toast.info("No active Stripe subscription found.");
+      }
+      refetch();
+    } catch (err) {
+      console.error("Sync error:", err);
+      toast.error("Failed to sync plan with Stripe.");
+    } finally {
+      setSyncLoading(false);
+    }
+  };
 
   const plan = subscription?.plan || "scout";
   const tokensUsed = subscription?.tokens_used || 0;
@@ -94,7 +115,7 @@ export default function BillingSettings() {
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           {plan === "scout" ? (
             <a
               href="/pricing"
@@ -121,6 +142,14 @@ export default function BillingSettings() {
               </a>
             </>
           )}
+          <button
+            onClick={handleSyncPlan}
+            disabled={syncLoading}
+            className="text-xs font-medium text-muted-foreground border border-border px-4 py-2 rounded-lg hover:bg-muted/30 transition-colors inline-flex items-center gap-1 disabled:opacity-50"
+          >
+            <RefreshCw size={12} className={syncLoading ? "animate-spin" : ""} />
+            {syncLoading ? "Syncing..." : "Sync Plan with Stripe"}
+          </button>
         </div>
       </div>
 
