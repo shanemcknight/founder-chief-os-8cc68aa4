@@ -313,6 +313,18 @@ export default function InboxMailPage() {
     setSentConfirm(false);
   }, [selected]);
 
+  const openForward = useCallback(() => {
+    if (!selected) return;
+    setComposeMode("compose");
+    setComposeTo("");
+    setComposeCc("");
+    setComposeSubject(`Fwd: ${(selected.subject || "").replace(/^Fwd:\s*/i, "")}`);
+    const originalBody = selected.body_full || "";
+    const separator = "\n\n---------- Forwarded message ----------\nFrom: " + (selected.from_name || "") + " <" + (selected.from_email || "") + ">\nDate: " + formatTime(selected.received_at || selected.created_at) + "\nSubject: " + (selected.subject || "") + "\n\n";
+    setComposeBody(separator + (isHtml(originalBody) ? originalBody.replace(/<[^>]*>/g, "") : originalBody));
+    setSentConfirm(false);
+  }, [selected]);
+
   const openCompose = useCallback(() => {
     setComposeMode("compose");
     setComposeTo("");
