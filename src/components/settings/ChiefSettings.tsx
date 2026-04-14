@@ -97,6 +97,12 @@ export default function ChiefSettings() {
         {savedKey && (
           <p className="text-[10px] text-emerald-400 mt-2">✓ Key connected — Chief uses your Anthropic key (unlimited)</p>
         )}
+        <p className="text-[11px] text-muted-foreground mt-3 leading-relaxed">
+          This is your Anthropic API key from{" "}
+          <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">console.anthropic.com</a>
+          {" "}— separate from your Claude.ai subscription. Don't have one? Create a free account →{" "}
+          <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">console.anthropic.com</a>
+        </p>
       </div>
 
       {/* Tone */}
