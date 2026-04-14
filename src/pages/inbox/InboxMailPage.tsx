@@ -29,6 +29,7 @@ import {
   Loader2,
   Reply,
   ReplyAll,
+  Forward,
   Plus,
   Check,
 } from "lucide-react";
