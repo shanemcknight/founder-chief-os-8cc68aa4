@@ -35,11 +35,17 @@ export default function LandingNav() {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            {links.map((l) => (
-              <a key={l} href={`#${l.toLowerCase()}`} className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-150">
-                {l}
-              </a>
-            ))}
+            {links.map((l) =>
+              l.isRoute ? (
+                <Link key={l.label} to={l.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-150">
+                  {l.label}
+                </Link>
+              ) : (
+                <a key={l.label} href={l.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-150">
+                  {l.label}
+                </a>
+              )
+            )}
           </div>
 
           <div className="flex items-center gap-3">
@@ -72,10 +78,16 @@ export default function LandingNav() {
       {mobileMenu && (
         <div className="fixed inset-0 z-40 pt-16 bg-background/95 backdrop-blur-sm md:hidden">
           <div className="flex flex-col items-center gap-6 pt-8">
-            {links.map((l) => (
-              <a key={l} href={`#${l.toLowerCase()}`} onClick={() => setMobileMenu(false)} className="text-lg text-foreground font-medium">
-                {l}
-              </a>
+            {links.map((l) =>
+              l.isRoute ? (
+                <Link key={l.label} to={l.href} onClick={() => setMobileMenu(false)} className="text-lg text-foreground font-medium">
+                  {l.label}
+                </Link>
+              ) : (
+                <a key={l.label} href={l.href} onClick={() => setMobileMenu(false)} className="text-lg text-foreground font-medium">
+                  {l.label}
+                </a>
+              )
             ))}
             <Link to="/login" onClick={() => setMobileMenu(false)} className="text-lg text-muted-foreground">Log in</Link>
           </div>
