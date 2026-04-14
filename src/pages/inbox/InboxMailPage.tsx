@@ -615,22 +615,6 @@ export default function InboxMailPage() {
               <p className="text-xs text-foreground/90 leading-relaxed whitespace-pre-line">{selected.body_full}</p>
             )}
 
-            {/* Reply buttons */}
-            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border/50">
-              <button
-                onClick={() => openReply("reply")}
-                className="flex items-center gap-1.5 text-xs font-medium text-foreground border border-border px-3 py-1.5 rounded-md hover:bg-muted/30 transition-colors"
-              >
-                <Reply size={12} /> Reply
-              </button>
-              <button
-                onClick={() => openReply("replyAll")}
-                className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground border border-border px-3 py-1.5 rounded-md hover:bg-muted/30 transition-colors"
-              >
-                <ReplyAll size={12} /> Reply All
-              </button>
-            </div>
-
             {/* Compose / Reply Area */}
             {composeMode && (
               <div className="mt-4 border border-border rounded-lg bg-card p-4 space-y-3">
