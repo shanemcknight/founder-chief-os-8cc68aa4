@@ -269,31 +269,42 @@ export default function WhiteLabelPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {pricingCards.map((card) => (
-              <DarkCard key={card.title} className={card.featured ? "border-primary ring-1 ring-primary/20" : ""}>
-                <h3 className="text-base font-semibold text-foreground mb-1">{card.title}</h3>
-                <p className="text-primary text-lg font-bold mb-4">{card.price}</p>
-                <ul className="space-y-2 mb-6">
-                  {card.items.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <span className="text-primary mt-0.5">✓</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href={CALENDLY}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`block text-center text-sm font-medium py-2.5 rounded-md transition-colors duration-150 ${
-                    card.ctaVariant === "default"
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "border border-border text-foreground hover:bg-accent/10"
-                  }`}
-                >
-                  {card.cta}
-                </a>
-                <p className="text-xs text-muted-foreground mt-3 italic">{card.note}</p>
-              </DarkCard>
+              <div key={card.title} className="flex flex-col">
+                <DarkCard className={card.featured ? "border-primary ring-1 ring-primary/20 flex-1" : "flex-1"}>
+                  <h3 className="text-base font-semibold text-foreground mb-1">{card.title}</h3>
+                  <p className="text-primary text-lg font-bold mb-4">{card.price}</p>
+                  <ul className="space-y-2 mb-6">
+                    {card.items.map((item) => (
+                      <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <span className="text-primary mt-0.5">✓</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href={CALENDLY}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`block text-center text-sm font-medium py-2.5 rounded-md transition-colors duration-150 ${
+                      card.ctaVariant === "default"
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "border border-border text-foreground hover:bg-accent/10"
+                    }`}
+                  >
+                    {card.cta}
+                  </a>
+                  <p className="text-xs text-muted-foreground mt-3 italic">{card.note}</p>
+                </DarkCard>
+                {card.featured && (
+                  <p className="text-xs text-muted-foreground italic mt-3 leading-relaxed">
+                    About AI token costs: MYTHOS HQ runs on Anthropic's Claude. During your build, we'll set up your organization's own Anthropic API account at{" "}
+                    <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline not-italic">
+                      console.anthropic.com
+                    </a>{" "}
+                    — you pay Anthropic directly for usage at their standard rates. No markup. No surprise bills. Full transparency.
+                  </p>
+                )}
+              </div>
             ))}
           </div>
         </div>
