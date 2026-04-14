@@ -5,6 +5,7 @@ import ChiefSettings from "@/components/settings/ChiefSettings";
 import ApiWebhooksSettings from "@/components/settings/ApiWebhooksSettings";
 import NotificationsSettings from "@/components/settings/NotificationsSettings";
 import EmailIntegrationSettings from "@/components/settings/EmailIntegrationSettings";
+import AiModelIntegration from "@/components/settings/AiModelIntegration";
 import BillingSettings from "@/components/settings/BillingSettings";
 
 const navItems = ["Account", "Team", "Integrations", "Chief Settings", "Billing", "API & Webhooks", "Notifications"];
