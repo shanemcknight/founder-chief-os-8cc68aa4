@@ -168,6 +168,23 @@ export default function AgentDeployPage() {
                       </button>
                     ))}
                   </div>
+                  {hasByokKey ? (
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                      <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />
+                      <span className="text-[11px] text-emerald-400 font-medium">✓ Using your Anthropic API key — all models unlocked</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg border" style={{ borderColor: "#5D9992", backgroundColor: "rgba(93,153,146,0.06)" }}>
+                      <Info size={14} className="shrink-0 mt-0.5" style={{ color: "#5D9992" }} />
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        <span className="font-semibold text-foreground">Unlock all models</span> — Connect your Anthropic API key in{" "}
+                        <Link to="/settings" className="font-medium underline underline-offset-2" style={{ color: "#5D9992" }}>
+                          Settings → Integrations
+                        </Link>{" "}
+                        to bypass token limits and use any model regardless of your plan.
+                      </p>
+                    </div>
+                  )}
                   <button onClick={next} disabled={!selectedModel} className="w-full bg-primary text-primary-foreground text-sm font-semibold py-3 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-40">
                     Continue →
                   </button>
