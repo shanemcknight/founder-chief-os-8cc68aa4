@@ -492,14 +492,23 @@ export default function InboxMailPage() {
               </p>
             )}
           </div>
-          <button
-            onClick={() => triggerSync()}
-            disabled={syncing}
-            className="flex items-center gap-1 text-[10px] font-semibold text-primary border border-primary/30 px-2 py-1 rounded hover:bg-primary/10 transition-colors disabled:opacity-50"
-          >
-            {syncing ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
-            Sync
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={openCompose}
+              className="flex items-center gap-1 text-[10px] font-semibold text-foreground border border-border px-2 py-1 rounded hover:bg-muted/30 transition-colors"
+            >
+              <Plus size={10} />
+              Compose
+            </button>
+            <button
+              onClick={() => triggerSync()}
+              disabled={syncing}
+              className="flex items-center gap-1 text-[10px] font-semibold text-primary border border-primary/30 px-2 py-1 rounded hover:bg-primary/10 transition-colors disabled:opacity-50"
+            >
+              {syncing ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+              Sync
+            </button>
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto">
           {filtered.map((email: any) => {
