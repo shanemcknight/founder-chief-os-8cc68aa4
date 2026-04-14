@@ -5,6 +5,7 @@ import ChiefSettings from "@/components/settings/ChiefSettings";
 import ApiWebhooksSettings from "@/components/settings/ApiWebhooksSettings";
 import NotificationsSettings from "@/components/settings/NotificationsSettings";
 import EmailIntegrationSettings from "@/components/settings/EmailIntegrationSettings";
+import AiModelIntegration from "@/components/settings/AiModelIntegration";
 import BillingSettings from "@/components/settings/BillingSettings";
 
 const navItems = ["Account", "Team", "Integrations", "Chief Settings", "Billing", "API & Webhooks", "Notifications"];
@@ -174,6 +175,8 @@ export default function SettingsPage() {
               <h2 className="text-lg font-bold text-foreground">Integrations</h2>
               <span className="text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 px-2 py-0.5 rounded">8 connected</span>
             </div>
+
+            <AiModelIntegration />
 
             <EmailIntegrationSettings />
 
