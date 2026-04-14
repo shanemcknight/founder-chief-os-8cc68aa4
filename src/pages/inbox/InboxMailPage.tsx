@@ -27,7 +27,12 @@ import {
   Inbox,
   RefreshCw,
   Loader2,
+  Reply,
+  ReplyAll,
+  Plus,
+  Check,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 // Demo data for empty DB
 const demoEmails = [
