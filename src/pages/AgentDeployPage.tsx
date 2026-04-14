@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { X, Sparkles } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { X, Sparkles, Info, CheckCircle2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const stepLabels = ["Choose Model", "Configure", "Connect Integrations", "Choose Channels"];
 
