@@ -214,6 +214,13 @@ export default function InboxMailPage() {
   const [syncing, setSyncing] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const hasSyncedRef = useRef(false);
+  const [composeMode, setComposeMode] = useState<"reply" | "replyAll" | "compose" | null>(null);
+  const [composeTo, setComposeTo] = useState("");
+  const [composeCc, setComposeCc] = useState("");
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeBody, setComposeBody] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sentConfirm, setSentConfirm] = useState(false);
 
   const fetchEmails = useCallback(async () => {
     if (!user) return;
