@@ -17,7 +17,14 @@ export default function LandingNav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const links = ["Features", "Social", "Sales", "Pricing", "Docs"];
+  const links = [
+    { label: "Features", href: "#features" },
+    { label: "Social", href: "#social" },
+    { label: "Sales", href: "#sales" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "White Label", href: "/white-label", isRoute: true },
+    { label: "Docs", href: "#docs" },
+  ];
 
   return (
     <>

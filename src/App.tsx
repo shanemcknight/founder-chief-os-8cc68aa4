@@ -20,6 +20,7 @@ import TermsPage from "./pages/TermsPage";
 import DataDeletionPage from "./pages/DataDeletionPage";
 import BetaPage from "./pages/BetaPage";
 import PricingPage from "./pages/PricingPage";
+import WhiteLabelPage from "./pages/WhiteLabelPage";
 
 // Social sub-pages
 import SocialLayout from "./pages/social/SocialLayout";
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="/data-deletion" element={<DataDeletionPage />} />
             <Route path="/beta" element={<BetaPage />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/white-label" element={<WhiteLabelPage />} />
             <Route path="/onboarding" element={<Navigate to="/beta" replace />} />
             <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<CommandPage />} />
