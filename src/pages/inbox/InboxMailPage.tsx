@@ -365,6 +365,8 @@ export default function InboxMailPage() {
     }
   }, [user, composeTo, composeCc, composeSubject, composeBody, composeMode, selected, closeCompose, fetchEmails]);
 
+  useEffect(() => {
+    if (filtered.length > 0 && !selectedId) {
       setSelectedId(filtered[0]?.id);
     }
   }, [filtered, selectedId]);
