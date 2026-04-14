@@ -27,7 +27,12 @@ import {
   Inbox,
   RefreshCw,
   Loader2,
+  Reply,
+  ReplyAll,
+  Plus,
+  Check,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 // Demo data for empty DB
 const demoEmails = [
@@ -209,6 +214,13 @@ export default function InboxMailPage() {
   const [syncing, setSyncing] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const hasSyncedRef = useRef(false);
+  const [composeMode, setComposeMode] = useState<"reply" | "replyAll" | "compose" | null>(null);
+  const [composeTo, setComposeTo] = useState("");
+  const [composeCc, setComposeCc] = useState("");
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeBody, setComposeBody] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sentConfirm, setSentConfirm] = useState(false);
 
   const fetchEmails = useCallback(async () => {
     if (!user) return;
@@ -248,7 +260,8 @@ export default function InboxMailPage() {
     }
   }, [user, syncing, fetchEmails]);
 
-  // Initial load: fetch emails + check last sync
+
+
   useEffect(() => {
     if (!user) return;
     const init = async () => {
@@ -287,6 +300,70 @@ export default function InboxMailPage() {
       : emails.filter((e: any) => e.category === selectedCategory);
 
   const selected = filtered.find((e: any) => e.id === selectedId) || filtered[0];
+
+  const openReply = useCallback((mode: "reply" | "replyAll") => {
+    if (!selected) return;
+    setComposeMode(mode);
+    setComposeTo(selected.from_email || "");
+    setComposeCc("");
+    setComposeSubject(`Re: ${(selected.subject || "").replace(/^Re:\s*/i, "")}`);
+    const chiefDraft = selected.draft_body || selected.email_drafts?.[0]?.draft_body || "";
+    setComposeBody(chiefDraft);
+    setSentConfirm(false);
+  }, [selected]);
+
+  const openCompose = useCallback(() => {
+    setComposeMode("compose");
+    setComposeTo("");
+    setComposeCc("");
+    setComposeSubject("");
+    setComposeBody("");
+    setSentConfirm(false);
+  }, []);
+
+  const closeCompose = useCallback(() => {
+    setComposeMode(null);
+    setComposeTo("");
+    setComposeCc("");
+    setComposeSubject("");
+    setComposeBody("");
+    setSentConfirm(false);
+  }, []);
+
+  const handleSend = useCallback(async () => {
+    if (!user || !composeTo || !composeSubject || !composeBody) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    setSending(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke("send-email-reply", {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+        body: {
+          to: composeTo,
+          cc: composeCc || undefined,
+          subject: composeSubject,
+          message: composeBody,
+          in_reply_to: composeMode === "reply" || composeMode === "replyAll" ? selected?.external_id : undefined,
+          email_id: selected?.id?.startsWith("demo-") ? undefined : selected?.id,
+          mode: composeMode === "compose" ? "new" : "reply",
+        },
+      });
+      if (res.error) throw res.error;
+      setSentConfirm(true);
+      toast.success("✓ Sent");
+      setTimeout(() => {
+        closeCompose();
+        fetchEmails();
+      }, 1500);
+    } catch (err: any) {
+      console.error("Send error:", err);
+      toast.error(err.message || "Failed to send");
+    } finally {
+      setSending(false);
+    }
+  }, [user, composeTo, composeCc, composeSubject, composeBody, composeMode, selected, closeCompose, fetchEmails]);
 
   useEffect(() => {
     if (filtered.length > 0 && !selectedId) {
@@ -415,14 +492,23 @@ export default function InboxMailPage() {
               </p>
             )}
           </div>
-          <button
-            onClick={() => triggerSync()}
-            disabled={syncing}
-            className="flex items-center gap-1 text-[10px] font-semibold text-primary border border-primary/30 px-2 py-1 rounded hover:bg-primary/10 transition-colors disabled:opacity-50"
-          >
-            {syncing ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
-            Sync
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={openCompose}
+              className="flex items-center gap-1 text-[10px] font-semibold text-foreground border border-border px-2 py-1 rounded hover:bg-muted/30 transition-colors"
+            >
+              <Plus size={10} />
+              Compose
+            </button>
+            <button
+              onClick={() => triggerSync()}
+              disabled={syncing}
+              className="flex items-center gap-1 text-[10px] font-semibold text-primary border border-primary/30 px-2 py-1 rounded hover:bg-primary/10 transition-colors disabled:opacity-50"
+            >
+              {syncing ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+              Sync
+            </button>
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto">
           {filtered.map((email: any) => {
@@ -514,6 +600,101 @@ export default function InboxMailPage() {
               <SanitizedHtml html={selected.body_full} />
             ) : (
               <p className="text-xs text-foreground/90 leading-relaxed whitespace-pre-line">{selected.body_full}</p>
+            )}
+
+            {/* Reply buttons */}
+            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border/50">
+              <button
+                onClick={() => openReply("reply")}
+                className="flex items-center gap-1.5 text-xs font-medium text-foreground border border-border px-3 py-1.5 rounded-md hover:bg-muted/30 transition-colors"
+              >
+                <Reply size={12} /> Reply
+              </button>
+              <button
+                onClick={() => openReply("replyAll")}
+                className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground border border-border px-3 py-1.5 rounded-md hover:bg-muted/30 transition-colors"
+              >
+                <ReplyAll size={12} /> Reply All
+              </button>
+            </div>
+
+            {/* Compose / Reply Area */}
+            {composeMode && (
+              <div className="mt-4 border border-border rounded-lg bg-card p-4 space-y-3">
+                {sentConfirm ? (
+                  <div className="flex items-center gap-2 py-4 justify-center">
+                    <Check size={16} className="text-[hsl(var(--success))]" />
+                    <span className="text-sm font-medium text-[hsl(var(--success))]">Sent</span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-semibold text-foreground">
+                        {composeMode === "compose" ? "New Email" : composeMode === "replyAll" ? "Reply All" : "Reply"}
+                      </p>
+                      <button onClick={closeCompose} className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-muted/30">
+                        <X size={14} />
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] text-muted-foreground w-8 shrink-0">To:</span>
+                        <Input
+                          value={composeTo}
+                          onChange={(e) => setComposeTo(e.target.value)}
+                          placeholder="recipient@example.com"
+                          className="h-7 text-xs bg-background"
+                        />
+                      </div>
+                      {composeMode === "replyAll" && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-muted-foreground w-8 shrink-0">Cc:</span>
+                          <Input
+                            value={composeCc}
+                            onChange={(e) => setComposeCc(e.target.value)}
+                            placeholder="cc@example.com"
+                            className="h-7 text-xs bg-background"
+                          />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] text-muted-foreground w-8 shrink-0">Subj:</span>
+                        <Input
+                          value={composeSubject}
+                          onChange={(e) => setComposeSubject(e.target.value)}
+                          placeholder="Subject"
+                          className="h-7 text-xs bg-background"
+                        />
+                      </div>
+                    </div>
+                    <Textarea
+                      value={composeBody}
+                      onChange={(e) => setComposeBody(e.target.value)}
+                      placeholder="Write your message..."
+                      className="min-h-[120px] text-xs bg-background resize-none"
+                    />
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-muted-foreground">{composeBody.length} chars</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={closeCompose}
+                          className="text-xs font-medium text-muted-foreground px-3 py-1.5 rounded-md hover:bg-muted/30 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleSend}
+                          disabled={sending || !composeTo || !composeBody}
+                          className="flex items-center gap-1.5 text-xs font-medium bg-primary text-primary-foreground px-4 py-1.5 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+                        >
+                          {sending ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                          {sending ? "Sending..." : "Send"}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
           </div>
 
