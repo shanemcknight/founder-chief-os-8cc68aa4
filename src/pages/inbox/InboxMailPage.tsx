@@ -601,6 +601,101 @@ export default function InboxMailPage() {
             ) : (
               <p className="text-xs text-foreground/90 leading-relaxed whitespace-pre-line">{selected.body_full}</p>
             )}
+
+            {/* Reply buttons */}
+            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border/50">
+              <button
+                onClick={() => openReply("reply")}
+                className="flex items-center gap-1.5 text-xs font-medium text-foreground border border-border px-3 py-1.5 rounded-md hover:bg-muted/30 transition-colors"
+              >
+                <Reply size={12} /> Reply
+              </button>
+              <button
+                onClick={() => openReply("replyAll")}
+                className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground border border-border px-3 py-1.5 rounded-md hover:bg-muted/30 transition-colors"
+              >
+                <ReplyAll size={12} /> Reply All
+              </button>
+            </div>
+
+            {/* Compose / Reply Area */}
+            {composeMode && (
+              <div className="mt-4 border border-border rounded-lg bg-card p-4 space-y-3">
+                {sentConfirm ? (
+                  <div className="flex items-center gap-2 py-4 justify-center">
+                    <Check size={16} className="text-[hsl(var(--success))]" />
+                    <span className="text-sm font-medium text-[hsl(var(--success))]">Sent</span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-semibold text-foreground">
+                        {composeMode === "compose" ? "New Email" : composeMode === "replyAll" ? "Reply All" : "Reply"}
+                      </p>
+                      <button onClick={closeCompose} className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-muted/30">
+                        <X size={14} />
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] text-muted-foreground w-8 shrink-0">To:</span>
+                        <Input
+                          value={composeTo}
+                          onChange={(e) => setComposeTo(e.target.value)}
+                          placeholder="recipient@example.com"
+                          className="h-7 text-xs bg-background"
+                        />
+                      </div>
+                      {composeMode === "replyAll" && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-muted-foreground w-8 shrink-0">Cc:</span>
+                          <Input
+                            value={composeCc}
+                            onChange={(e) => setComposeCc(e.target.value)}
+                            placeholder="cc@example.com"
+                            className="h-7 text-xs bg-background"
+                          />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] text-muted-foreground w-8 shrink-0">Subj:</span>
+                        <Input
+                          value={composeSubject}
+                          onChange={(e) => setComposeSubject(e.target.value)}
+                          placeholder="Subject"
+                          className="h-7 text-xs bg-background"
+                        />
+                      </div>
+                    </div>
+                    <Textarea
+                      value={composeBody}
+                      onChange={(e) => setComposeBody(e.target.value)}
+                      placeholder="Write your message..."
+                      className="min-h-[120px] text-xs bg-background resize-none"
+                    />
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-muted-foreground">{composeBody.length} chars</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={closeCompose}
+                          className="text-xs font-medium text-muted-foreground px-3 py-1.5 rounded-md hover:bg-muted/30 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleSend}
+                          disabled={sending || !composeTo || !composeBody}
+                          className="flex items-center gap-1.5 text-xs font-medium bg-primary text-primary-foreground px-4 py-1.5 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+                        >
+                          {sending ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                          {sending ? "Sending..." : "Send"}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Bottom: CHIEF Panel */}
