@@ -140,7 +140,7 @@ export default function CommandPage() {
 
       {/* Dashboard Modal Overlay */}
       {activeModal && ModalContent && (
-        <div className="fixed inset-0 z-50 flex flex-col">
+        <div className="fixed left-0 right-0 bottom-0 z-50 flex flex-col" style={{ top: 56 }}>
           {/* Dimmed backdrop */}
           <div
             className="absolute inset-0 bg-background/80 backdrop-blur-sm animate-fade-in"
@@ -148,8 +148,7 @@ export default function CommandPage() {
           />
           {/* Modal panel — slides up from bottom */}
           <div
-            className="relative mt-auto w-full bg-card border-t border-border rounded-t-xl overflow-auto animate-fade-in"
-            style={{ height: "90vh" }}
+            className="relative mt-auto w-full h-full bg-card border-t border-border rounded-t-xl overflow-auto animate-fade-in"
           >
             {/* Header bar */}
             <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-card border-b border-border">
