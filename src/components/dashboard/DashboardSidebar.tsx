@@ -205,6 +205,13 @@ export default function DashboardSidebar() {
 
         <div className="border-t border-border my-3" />
 
+        {/* Upcoming Tasks Widget */}
+        <div className="px-1 mb-3">
+          <UpcomingTasksWidget />
+        </div>
+
+        <div className="border-t border-border my-3" />
+
         <NavLink to="/agents/new" className={linkClass(location.pathname === "/agents/new")}>
           <PlusCircle size={16} />
           Deploy New
