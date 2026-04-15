@@ -41,6 +41,42 @@ export type Database = {
         }
         Relationships: []
       }
+      beta_invite_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          id: string
+          max_uses: number
+          status: string
+          used_at: string | null
+          used_by: string | null
+          uses: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          max_uses?: number
+          status?: string
+          used_at?: string | null
+          used_by?: string | null
+          uses?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          max_uses?: number
+          status?: string
+          used_at?: string | null
+          used_by?: string | null
+          uses?: number
+        }
+        Relationships: []
+      }
       beta_testers: {
         Row: {
           created_at: string
