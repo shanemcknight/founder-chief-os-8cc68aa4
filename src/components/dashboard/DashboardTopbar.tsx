@@ -24,7 +24,7 @@ export default function DashboardTopbar() {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, setEnvironment } = useAuth();
 
   const displayName = profile?.full_name || user?.email?.split("@")[0] || "User";
   const initials = displayName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
