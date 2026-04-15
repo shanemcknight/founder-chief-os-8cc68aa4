@@ -6,6 +6,8 @@ import {
   X,
 } from "lucide-react";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useEnvironmentData } from "@/hooks/useEnvironmentData";
+import { useAuth } from "@/contexts/AuthContext";
 import CalendarTimeline from "@/components/dashboard/CalendarTimeline";
 import ConnectedToolsGrid from "@/components/dashboard/ConnectedToolsGrid";
 import ActiveAgentsOrgChart from "@/components/dashboard/ActiveAgentsOrgChart";
