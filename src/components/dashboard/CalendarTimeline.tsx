@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import TaskDetailPanel, { type TaskDetail, type TaskStatus } from "@/components/dashboard/TaskDetailPanel";
 import SocialDetailPanel, { type SocialPostDetail } from "@/components/dashboard/SocialDetailPanel";
+import TaskCreateForm from "@/components/dashboard/TaskCreateForm";
 
 // --- Types ---
 
@@ -122,6 +123,9 @@ export default function CalendarTimeline() {
   // Social detail panel state
   const [selectedSocialPost, setSelectedSocialPost] = useState<SocialPostDetail | null>(null);
   const [socialPanelOpen, setSocialPanelOpen] = useState(false);
+
+  // Create form state
+  const [createOpen, setCreateOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("timeline-show-social", String(showSocial));
@@ -287,6 +291,17 @@ export default function CalendarTimeline() {
     setSocialPanelOpen(false);
   };
 
+  const handleCreateTask = (newTask: TaskDetail) => {
+    const timelineTask: TimelineTask = {
+      id: newTask.id,
+      title: newTask.title,
+      start_time: newTask.start_time,
+      due_time: newTask.due_time,
+      status: newTask.status,
+    };
+    setTasks((prev) => [...prev, timelineTask]);
+  };
+
   const nowOffset = isToday(selectedDate) ? timeToOffset(new Date(), effectiveStart) : null;
   const hasItems = tasks.length > 0 || (showSocial && socialPosts.length > 0);
 
@@ -339,7 +354,7 @@ export default function CalendarTimeline() {
             <span className="text-[11px] text-muted-foreground">Social Posts</span>
           </label>
 
-          <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={() => toast.info("Task creation coming soon")}>
+          <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={() => setCreateOpen(true)}>
             <Plus size={12} /> Task
           </Button>
         </div>
@@ -457,6 +472,13 @@ export default function CalendarTimeline() {
         onReschedule={handleSocialReschedule}
         onUpdate={handleSocialUpdate}
         onDelete={handleSocialDelete}
+      />
+
+      {/* Task Create Form */}
+      <TaskCreateForm
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreate={handleCreateTask}
       />
     </>
   );
