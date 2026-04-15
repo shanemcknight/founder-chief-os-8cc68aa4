@@ -27,6 +27,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { useInboxCounts } from "@/hooks/useInboxCounts";
+import UpcomingTasksWidget from "@/components/dashboard/UpcomingTasksWidget";
 
 const socialSubItems = [
   { label: "Calendar", path: "/social/calendar", icon: Calendar },
