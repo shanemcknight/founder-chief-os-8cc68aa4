@@ -315,6 +315,14 @@ function EmailRow({ email, selected, onClick }: { email: PendingEmail; selected:
       <div className="flex items-center gap-2">
         <Badge className={cn("text-[9px] px-1.5 py-0", sCfg.className)}>{sCfg.label}</Badge>
         <span className="text-[10px] text-muted-foreground truncate">{email.from_company}</span>
+        {(() => {
+          const inbox = INBOX_SOURCES.find(i => i.id === email.inbox_source);
+          return inbox ? (
+            <Badge variant="outline" className="text-[9px] px-1.5 py-0 bg-muted/50 text-muted-foreground border-border shrink-0 ml-auto">
+              {inbox.label}
+            </Badge>
+          ) : null;
+        })()}
       </div>
     </button>
   );
@@ -627,6 +635,37 @@ export default function EmailsPendingDashboard() {
       </div>
 
       {!expanded && <div />}
+
+      {/* Inbox Selector Tabs */}
+      {expanded && (
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          <button
+            onClick={() => setSelectedInbox("all")}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors",
+              selectedInbox === "all"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+            )}
+          >
+            All Inboxes ({inboxCounts.all})
+          </button>
+          {INBOX_SOURCES.map(inbox => (
+            <button
+              key={inbox.id}
+              onClick={() => setSelectedInbox(inbox.id)}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors",
+                selectedInbox === inbox.id
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              {inbox.label} ({inboxCounts[inbox.id] ?? 0})
+            </button>
+          ))}
+        </div>
+      )}
 
       {expanded && (
         <>
