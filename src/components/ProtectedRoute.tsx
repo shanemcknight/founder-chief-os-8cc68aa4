@@ -3,13 +3,17 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+const ADMIN_EMAIL = "shane@tophatprovisions.com";
+
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { session, user, loading } = useAuth();
 
-  // Check beta tester status
+  const isAdmin = user?.email?.toLowerCase() === ADMIN_EMAIL;
+
+  // Check beta tester status (skip for admin)
   const { data: betaStatus, isLoading: betaLoading } = useQuery({
     queryKey: ["beta-status", user?.email],
-    enabled: !!user?.email,
+    enabled: !!user?.email && !isAdmin,
     queryFn: async () => {
       const { data } = await supabase
         .from("beta_testers")
@@ -22,7 +26,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
   const { data: approved, isLoading: approvalLoading } = useQuery({
     queryKey: ["profile-approved", user?.id],
-    enabled: !!user?.id,
+    enabled: !!user?.id && !isAdmin,
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
@@ -33,7 +37,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     },
   });
 
-  if (loading || betaLoading || approvalLoading) {
+  if (loading || (!isAdmin && (betaLoading || approvalLoading))) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -43,6 +47,11 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
   if (!session) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Admin bypasses all gates
+  if (isAdmin) {
+    return <>{children}</>;
   }
 
   // Beta gate: must be in beta_testers with approved status
