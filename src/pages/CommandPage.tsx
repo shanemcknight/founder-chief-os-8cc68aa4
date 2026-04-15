@@ -1,15 +1,10 @@
 import {
-  ShoppingBag,
-  Package,
-  MailOpen,
-  CreditCard,
-  Calculator,
-  BarChart3,
   ArrowUpRight,
   Minus,
 } from "lucide-react";
 import { useSubscription } from "@/hooks/useSubscription";
 import CalendarTimeline from "@/components/dashboard/CalendarTimeline";
+import ConnectedToolsGrid from "@/components/dashboard/ConnectedToolsGrid";
 
 const kpis = [
   { label: "Revenue Today", value: "$4,840", barColor: "bg-accent", trend: "+12%", up: true, sparkline: [30, 45, 38, 55, 48, 62, 58] },
@@ -32,23 +27,6 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
   );
 }
 
-const toolStatus: Record<string, string> = {
-  Shopify: "bg-success",
-  Amazon: "bg-destructive",
-  Klaviyo: "bg-success",
-  Stripe: "bg-success",
-  QuickBooks: "bg-success",
-  "Google Analytics": "bg-success",
-};
-
-const tools = [
-  { name: "Shopify", icon: ShoppingBag, metrics: ["$4,840 today", "23 orders", "2 flagged"] },
-  { name: "Amazon", icon: Package, metrics: ["$2,210 today", "18 orders", "1 suppressed listing"] },
-  { name: "Klaviyo", icon: MailOpen, metrics: ["38.2% open rate", "1 campaign live", "3,068 subscribers"] },
-  { name: "Stripe", icon: CreditCard, metrics: ["$1,630 today", "0 failed payments", "14 active subscriptions"] },
-  { name: "QuickBooks", icon: Calculator, metrics: ["$4,200 outstanding", "2 invoices due", "Next payroll Friday"] },
-  { name: "Google Analytics", icon: BarChart3, metrics: ["1,842 sessions", "3.4% conversion", "+18% vs last week"] },
-];
 
 const priorityBadgeClass: Record<string, string> = {
   HIGH: "bg-destructive/15 text-destructive",
@@ -102,28 +80,7 @@ export default function CommandPage() {
 
       <CalendarTimeline />
 
-      <div>
-        <h2 className="text-sm font-semibold text-foreground mb-3">Connected Tools</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-          {tools.map((tool) => {
-            const Icon = tool.icon;
-            return (
-              <div key={tool.name} className="bg-card border border-border rounded-xl p-4 hover:border-primary/50 transition-colors duration-150">
-                <div className="flex items-center gap-2 mb-2">
-                  <Icon size={16} className="text-muted-foreground" />
-                  <p className="text-sm font-semibold text-foreground">{tool.name}</p>
-                  <span className={`w-2 h-2 rounded-full ml-auto ${toolStatus[tool.name]}`} />
-                </div>
-                <div className="space-y-0.5">
-                  {tool.metrics.map((m, i) => (
-                    <p key={i} className={`text-xs ${i === 0 ? "text-foreground font-medium" : "text-muted-foreground"}`}>{m}</p>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <ConnectedToolsGrid />
 
       <div>
         <h2 className="text-sm font-semibold text-foreground mb-3">Needs Your Attention</h2>
