@@ -473,6 +473,13 @@ export default function CalendarTimeline() {
         onUpdate={handleSocialUpdate}
         onDelete={handleSocialDelete}
       />
+
+      {/* Task Create Form */}
+      <TaskCreateForm
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreate={handleCreateTask}
+      />
     </>
   );
 }
