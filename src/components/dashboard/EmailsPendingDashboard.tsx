@@ -544,14 +544,24 @@ export default function EmailsPendingDashboard() {
   const [emails, setEmails] = useState(MOCK_EMAILS);
   const emailsRefresh = useAutoRefresh({ intervalMs: 2 * 60 * 1000 });
   const [selectedId, setSelectedId] = useState<string | null>(MOCK_EMAILS[0]?.id ?? null);
+  const [selectedInbox, setSelectedInbox] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<"ALL" | Priority>("HIGH");
   const [statusFilter, setStatusFilter] = useState<"ALL" | EmailStatus>("ALL");
   const [sortBy, setSortBy] = useState<"priority" | "date" | "status">("priority");
   const [rejectOpen, setRejectOpen] = useState(false);
   const [expanded, setExpanded] = useState(true);
 
+  const inboxCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: emails.filter(e => e.priority === "HIGH" || e.priority_score >= 7).length };
+    INBOX_SOURCES.forEach(inbox => {
+      counts[inbox.id] = emails.filter(e => e.inbox_source === inbox.id && (e.priority === "HIGH" || e.priority_score >= 7)).length;
+    });
+    return counts;
+  }, [emails]);
+
   const filteredEmails = useMemo(() => {
     let list = emails.filter((e) => {
+      if (selectedInbox !== "all" && e.inbox_source !== selectedInbox) return false;
       if (priorityFilter !== "ALL" && e.priority !== priorityFilter) return false;
       if (statusFilter !== "ALL" && e.status !== statusFilter) return false;
       return true;
