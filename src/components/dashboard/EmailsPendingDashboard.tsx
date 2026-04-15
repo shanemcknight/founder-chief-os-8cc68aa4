@@ -581,7 +581,7 @@ export default function EmailsPendingDashboard() {
     else list.sort((a, b) => a.status.localeCompare(b.status));
 
     return list;
-  }, [emails, priorityFilter, statusFilter, sortBy]);
+  }, [emails, selectedInbox, priorityFilter, statusFilter, sortBy]);
 
   const selectedEmail = emails.find((e) => e.id === selectedId) ?? null;
 
