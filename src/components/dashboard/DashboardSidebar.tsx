@@ -27,6 +27,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { useInboxCounts } from "@/hooks/useInboxCounts";
+import UpcomingTasksWidget from "@/components/dashboard/UpcomingTasksWidget";
 
 const socialSubItems = [
   { label: "Calendar", path: "/social/calendar", icon: Calendar },
@@ -201,6 +202,13 @@ export default function DashboardSidebar() {
             </NavLink>
           );
         })}
+
+        <div className="border-t border-border my-3" />
+
+        {/* Upcoming Tasks Widget */}
+        <div className="px-1 mb-3">
+          <UpcomingTasksWidget />
+        </div>
 
         <div className="border-t border-border my-3" />
 
