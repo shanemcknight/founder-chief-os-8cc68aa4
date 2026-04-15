@@ -2,14 +2,24 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
+export interface UserProfile {
+  full_name: string | null;
+  business_name: string | null;
+  approved: boolean;
+  environment: "production" | "sandbox";
+  is_admin: boolean;
+  api_keys_connected: boolean;
+}
+
 interface AuthContextType {
   session: Session | null;
   user: User | null;
-  profile: { full_name: string | null; business_name: string | null; approved: boolean } | null;
+  profile: UserProfile | null;
   loading: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  setEnvironment: (env: "production" | "sandbox") => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
