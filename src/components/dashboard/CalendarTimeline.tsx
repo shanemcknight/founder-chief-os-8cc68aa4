@@ -8,10 +8,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import TaskDetailPanel, { type TaskDetail, type TaskStatus } from "@/components/dashboard/TaskDetailPanel";
 
 // --- Types ---
-
-type TaskStatus = "completed" | "in_progress" | "scheduled" | "overdue" | "due_soon";
 
 interface TimelineTask {
   id: string;
@@ -54,7 +53,7 @@ function getMockSocialPosts(day: Date): TimelineSocialPost[] {
 
 // --- Helpers ---
 
-const STATUS_COLORS: Record<TaskStatus, { bg: string; border: string; text: string }> = {
+const STATUS_COLORS: Record<string, { bg: string; border: string; text: string }> = {
   completed: { bg: "bg-emerald-500/20", border: "border-emerald-500/40", text: "text-emerald-300" },
   in_progress: { bg: "bg-primary/20", border: "border-primary/40", text: "text-primary" },
   scheduled: { bg: "bg-muted/40", border: "border-border", text: "text-muted-foreground" },
@@ -62,7 +61,7 @@ const STATUS_COLORS: Record<TaskStatus, { bg: string; border: string; text: stri
   overdue: { bg: "bg-destructive/20", border: "border-destructive/40", text: "text-destructive" },
 };
 
-const HOUR_WIDTH = 120; // px per hour
+const HOUR_WIDTH = 120;
 
 function timeToOffset(time: Date, startHour: number): number {
   const hours = time.getHours() + time.getMinutes() / 60;
@@ -82,6 +81,25 @@ function formatHourLabel(hour: number): string {
   return hour < 12 ? `${hour}am` : `${hour - 12}pm`;
 }
 
+function toTaskDetail(t: TimelineTask): TaskDetail {
+  return {
+    id: t.id,
+    title: t.title,
+    description: "",
+    assigned_to: "chief",
+    start_time: t.start_time,
+    due_time: t.due_time,
+    priority: "normal",
+    skills: [],
+    dependencies: [],
+    recurring: false,
+    recurring_pattern: "daily",
+    recurring_value: "",
+    notes: "",
+    status: t.status,
+  };
+}
+
 // --- Component ---
 
 export default function CalendarTimeline() {
@@ -96,18 +114,19 @@ export default function CalendarTimeline() {
   const [socialPosts, setSocialPosts] = useState<TimelineSocialPost[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Persist toggle
+  // Task detail panel state
+  const [selectedTask, setSelectedTask] = useState<TaskDetail | null>(null);
+  const [panelOpen, setPanelOpen] = useState(false);
+
   useEffect(() => {
     localStorage.setItem("timeline-show-social", String(showSocial));
   }, [showSocial]);
 
-  // Load data
   useEffect(() => {
     setTasks(getMockTasks(selectedDate));
     setSocialPosts(getMockSocialPosts(selectedDate));
   }, [selectedDate]);
 
-  // Auto-scroll to current hour on mount
   useEffect(() => {
     if (scrollRef.current && isToday(selectedDate)) {
       const now = new Date();
@@ -116,7 +135,6 @@ export default function CalendarTimeline() {
     }
   }, [selectedDate, startHour]);
 
-  // Compute dynamic range: extend if tasks fall outside
   const effectiveStart = useMemo(() => {
     let min = startHour;
     tasks.forEach((t) => { min = Math.min(min, t.start_time.getHours()); });
@@ -139,12 +157,13 @@ export default function CalendarTimeline() {
 
   const totalWidth = (effectiveEnd - effectiveStart) * HOUR_WIDTH;
 
-  // --- Drag logic ---
+  // Drag state
   const dragRef = useRef<{
     taskId: string;
     startX: number;
     initialLeft: number;
     duration: number;
+    moved: boolean;
   } | null>(null);
   const [dragDelta, setDragDelta] = useState<{ id: string; delta: number } | null>(null);
 
@@ -157,30 +176,42 @@ export default function CalendarTimeline() {
       startX: clientX,
       initialLeft: timeToOffset(task.start_time, effectiveStart),
       duration,
+      moved: false,
     };
     setDragDelta({ id: task.id, delta: 0 });
 
     const onMove = (ev: MouseEvent | TouchEvent) => {
       if (!dragRef.current) return;
       const cx = "touches" in ev ? ev.touches[0].clientX : ev.clientX;
-      setDragDelta({ id: dragRef.current.taskId, delta: cx - dragRef.current.startX });
+      const delta = cx - dragRef.current.startX;
+      if (Math.abs(delta) > 3) dragRef.current.moved = true;
+      setDragDelta({ id: dragRef.current.taskId, delta });
     };
 
     const onEnd = () => {
-      if (dragRef.current && dragDelta) {
-        const finalLeft = dragRef.current.initialLeft + (dragDelta?.delta ?? 0);
-        const newStart = offsetToTime(Math.max(0, finalLeft), effectiveStart, selectedDate);
-        const durationMs = dragRef.current.duration * 60 * 60 * 1000;
-        const newEnd = new Date(newStart.getTime() + durationMs);
-
-        setTasks((prev) =>
-          prev.map((t) =>
-            t.id === dragRef.current!.taskId
-              ? { ...t, start_time: newStart, due_time: newEnd }
-              : t
-          )
-        );
-        toast.success(`Task rescheduled to ${format(newStart, "h:mma")}`);
+      const ref = dragRef.current;
+      if (ref) {
+        if (!ref.moved) {
+          // It was a click, open detail panel
+          const clickedTask = tasks.find((t) => t.id === ref.taskId);
+          if (clickedTask) {
+            setSelectedTask(toTaskDetail(clickedTask));
+            setPanelOpen(true);
+          }
+        } else {
+          // It was a drag, reschedule
+          const currentDelta = dragDelta?.delta ?? 0;
+          const finalLeft = ref.initialLeft + currentDelta;
+          const newStart = offsetToTime(Math.max(0, finalLeft), effectiveStart, selectedDate);
+          const durationMs = ref.duration * 60 * 60 * 1000;
+          const newEnd = new Date(newStart.getTime() + durationMs);
+          setTasks((prev) =>
+            prev.map((t) =>
+              t.id === ref.taskId ? { ...t, start_time: newStart, due_time: newEnd } : t
+            )
+          );
+          toast.success(`Task rescheduled to ${format(newStart, "h:mma")}`);
+        }
       }
       dragRef.current = null;
       setDragDelta(null);
@@ -194,170 +225,193 @@ export default function CalendarTimeline() {
     document.addEventListener("mouseup", onEnd);
     document.addEventListener("touchmove", onMove);
     document.addEventListener("touchend", onEnd);
-  }, [effectiveStart, selectedDate]);
+  }, [effectiveStart, selectedDate, tasks]);
 
-  // Current-time marker
+  // Panel handlers
+  const handleTaskSave = (updated: TaskDetail) => {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === updated.id
+          ? { ...t, title: updated.title, start_time: updated.start_time, due_time: updated.due_time, status: updated.status }
+          : t
+      )
+    );
+    setPanelOpen(false);
+  };
+
+  const handleTaskDelete = (taskId: string) => {
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    setPanelOpen(false);
+  };
+
+  const handleTaskComplete = (taskId: string) => {
+    setTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, status: "completed" as TaskStatus } : t))
+    );
+    setPanelOpen(false);
+  };
+
   const nowOffset = isToday(selectedDate) ? timeToOffset(new Date(), effectiveStart) : null;
-
   const hasItems = tasks.length > 0 || (showSocial && socialPosts.length > 0);
 
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
-      {/* Header */}
-      <div className="flex flex-wrap items-center gap-3 p-3 border-b border-border">
-        <h2 className="text-sm font-semibold text-foreground mr-auto">Timeline</h2>
+    <>
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        {/* Header */}
+        <div className="flex flex-wrap items-center gap-3 p-3 border-b border-border">
+          <h2 className="text-sm font-semibold text-foreground mr-auto">Timeline</h2>
 
-        {/* Date picker */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5">
-              <CalendarIcon size={12} />
-              {isToday(selectedDate) ? "Today" : format(selectedDate, "MMM d")}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="end">
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(d) => d && setSelectedDate(d)}
-              className="p-3 pointer-events-auto"
-            />
-          </PopoverContent>
-        </Popover>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5">
+                <CalendarIcon size={12} />
+                {isToday(selectedDate) ? "Today" : format(selectedDate, "MMM d")}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(d) => d && setSelectedDate(d)}
+                className="p-3 pointer-events-auto"
+              />
+            </PopoverContent>
+          </Popover>
 
-        {/* Work hours */}
-        <div className="flex items-center gap-1">
-          <Select value={String(startHour)} onValueChange={(v) => setStartHour(Number(v))}>
-            <SelectTrigger className="h-7 w-[68px] text-xs"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 24 }, (_, i) => (
-                <SelectItem key={i} value={String(i)}>{formatHourLabel(i)}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <span className="text-[10px] text-muted-foreground">to</span>
-          <Select value={String(endHour)} onValueChange={(v) => setEndHour(Number(v))}>
-            <SelectTrigger className="h-7 w-[68px] text-xs"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 24 }, (_, i) => (
-                <SelectItem key={i} value={String(i)}>{formatHourLabel(i)}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-1">
+            <Select value={String(startHour)} onValueChange={(v) => setStartHour(Number(v))}>
+              <SelectTrigger className="h-7 w-[68px] text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 24 }, (_, i) => (
+                  <SelectItem key={i} value={String(i)}>{formatHourLabel(i)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <span className="text-[10px] text-muted-foreground">to</span>
+            <Select value={String(endHour)} onValueChange={(v) => setEndHour(Number(v))}>
+              <SelectTrigger className="h-7 w-[68px] text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 24 }, (_, i) => (
+                  <SelectItem key={i} value={String(i)}>{formatHourLabel(i)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <label className="flex items-center gap-1.5 cursor-pointer select-none">
+            <Checkbox checked={showSocial} onCheckedChange={(v) => setShowSocial(!!v)} className="h-3.5 w-3.5" />
+            <span className="text-[11px] text-muted-foreground">Social Posts</span>
+          </label>
+
+          <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={() => toast.info("Task creation coming soon")}>
+            <Plus size={12} /> Task
+          </Button>
         </div>
 
-        {/* Social toggle */}
-        <label className="flex items-center gap-1.5 cursor-pointer select-none">
-          <Checkbox checked={showSocial} onCheckedChange={(v) => setShowSocial(!!v)} className="h-3.5 w-3.5" />
-          <span className="text-[11px] text-muted-foreground">Social Posts</span>
-        </label>
-
-        {/* Add task */}
-        <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={() => toast.info("Task creation coming soon")}>
-          <Plus size={12} /> Task
-        </Button>
-      </div>
-
-      {/* Timeline body */}
-      {!hasItems ? (
-        <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-          No tasks scheduled for this day
-        </div>
-      ) : (
-        <div ref={scrollRef} className="overflow-x-auto overflow-y-hidden">
-          <div className="relative" style={{ width: totalWidth, minHeight: 120 }}>
-            {/* Hour labels + grid lines */}
-            <div className="flex border-b border-border">
-              {hours.map((h) => (
-                <div
-                  key={h}
-                  className="shrink-0 text-[10px] text-muted-foreground py-1.5 pl-2 border-l border-border/50 first:border-l-0"
-                  style={{ width: HOUR_WIDTH }}
-                >
-                  {formatHourLabel(h)}
-                </div>
-              ))}
-            </div>
-
-            {/* Grid lines behind blocks */}
-            <div className="absolute top-8 bottom-0 left-0 right-0 flex pointer-events-none">
-              {hours.map((h) => (
-                <div key={h} className="shrink-0 border-l border-border/20 first:border-l-0" style={{ width: HOUR_WIDTH }} />
-              ))}
-            </div>
-
-            {/* Now marker */}
-            {nowOffset !== null && nowOffset > 0 && nowOffset < totalWidth && (
-              <div
-                className="absolute top-8 bottom-0 w-px bg-destructive/60 z-20"
-                style={{ left: nowOffset }}
-              >
-                <div className="w-2 h-2 rounded-full bg-destructive -translate-x-[3px] -translate-y-0.5" />
-              </div>
-            )}
-
-            {/* Task blocks row */}
-            <div className="relative h-11 mt-1 mx-0">
-              {tasks.map((task) => {
-                const left = timeToOffset(task.start_time, effectiveStart);
-                const width = Math.max(timeToOffset(task.due_time, effectiveStart) - left, 30);
-                const colors = STATUS_COLORS[task.status];
-                const delta = dragDelta?.id === task.id ? dragDelta.delta : 0;
-
-                return (
+        {/* Timeline body */}
+        {!hasItems ? (
+          <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+            No tasks scheduled for this day
+          </div>
+        ) : (
+          <div ref={scrollRef} className="overflow-x-auto overflow-y-hidden">
+            <div className="relative" style={{ width: totalWidth, minHeight: 120 }}>
+              <div className="flex border-b border-border">
+                {hours.map((h) => (
                   <div
-                    key={task.id}
-                    className={cn(
-                      "absolute top-1 h-9 rounded-md border flex items-center gap-1 px-2 cursor-grab active:cursor-grabbing select-none transition-shadow hover:shadow-md hover:scale-[1.02] origin-left",
-                      colors.bg,
-                      colors.border,
-                      dragDelta?.id === task.id && "z-30 shadow-lg"
-                    )}
-                    style={{
-                      left: left + delta,
-                      width,
-                      transition: dragDelta?.id === task.id ? "none" : "transform 200ms ease-out",
-                    }}
-                    onMouseDown={(e) => handleDragStart(e, task)}
-                    onTouchStart={(e) => handleDragStart(e, task)}
-                    title={task.title}
+                    key={h}
+                    className="shrink-0 text-[10px] text-muted-foreground py-1.5 pl-2 border-l border-border/50 first:border-l-0"
+                    style={{ width: HOUR_WIDTH }}
                   >
-                    <GripVertical size={10} className="shrink-0 text-muted-foreground/50" />
-                    <span className={cn("text-[11px] font-medium truncate", colors.text)}>
-                      {task.title}
-                    </span>
+                    {formatHourLabel(h)}
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
 
-            {/* Social post blocks row */}
-            {showSocial && socialPosts.length > 0 && (
-              <div className="relative h-9 mx-0 mb-2">
-                {socialPosts.map((post) => {
-                  const left = timeToOffset(post.start_time, effectiveStart);
-                  const width = Math.max(timeToOffset(post.due_time, effectiveStart) - left, 60);
+              <div className="absolute top-8 bottom-0 left-0 right-0 flex pointer-events-none">
+                {hours.map((h) => (
+                  <div key={h} className="shrink-0 border-l border-border/20 first:border-l-0" style={{ width: HOUR_WIDTH }} />
+                ))}
+              </div>
+
+              {nowOffset !== null && nowOffset > 0 && nowOffset < totalWidth && (
+                <div className="absolute top-8 bottom-0 w-px bg-destructive/60 z-20" style={{ left: nowOffset }}>
+                  <div className="w-2 h-2 rounded-full bg-destructive -translate-x-[3px] -translate-y-0.5" />
+                </div>
+              )}
+
+              <div className="relative h-11 mt-1 mx-0">
+                {tasks.map((task) => {
+                  const left = timeToOffset(task.start_time, effectiveStart);
+                  const width = Math.max(timeToOffset(task.due_time, effectiveStart) - left, 30);
+                  const colors = STATUS_COLORS[task.status] || STATUS_COLORS.scheduled;
+                  const delta = dragDelta?.id === task.id ? dragDelta.delta : 0;
 
                   return (
                     <div
-                      key={post.id}
-                      className="absolute top-0 h-8 rounded-md border border-primary/20 bg-primary/8 flex items-center gap-1 px-2 cursor-pointer select-none hover:bg-primary/15 transition-colors"
-                      style={{ left, width }}
-                      onClick={() => toast.info(`Social post: ${post.title}`)}
-                      title={post.title}
+                      key={task.id}
+                      className={cn(
+                        "absolute top-1 h-9 rounded-md border flex items-center gap-1 px-2 cursor-grab active:cursor-grabbing select-none transition-shadow hover:shadow-md hover:scale-[1.02] origin-left",
+                        colors.bg,
+                        colors.border,
+                        dragDelta?.id === task.id && "z-30 shadow-lg"
+                      )}
+                      style={{
+                        left: left + delta,
+                        width,
+                        transition: dragDelta?.id === task.id ? "none" : "transform 200ms ease-out",
+                      }}
+                      onMouseDown={(e) => handleDragStart(e, task)}
+                      onTouchStart={(e) => handleDragStart(e, task)}
+                      title={task.title}
                     >
-                      <Smartphone size={10} className="shrink-0 text-primary/60" />
-                      <span className="text-[10px] text-primary/80 font-medium truncate">
-                        {post.title}
+                      <GripVertical size={10} className="shrink-0 text-muted-foreground/50" />
+                      <span className={cn("text-[11px] font-medium truncate", colors.text)}>
+                        {task.title}
                       </span>
                     </div>
                   );
                 })}
               </div>
-            )}
+
+              {showSocial && socialPosts.length > 0 && (
+                <div className="relative h-9 mx-0 mb-2">
+                  {socialPosts.map((post) => {
+                    const left = timeToOffset(post.start_time, effectiveStart);
+                    const width = Math.max(timeToOffset(post.due_time, effectiveStart) - left, 60);
+
+                    return (
+                      <div
+                        key={post.id}
+                        className="absolute top-0 h-8 rounded-md border border-primary/20 bg-primary/[0.08] flex items-center gap-1 px-2 cursor-pointer select-none hover:bg-primary/15 transition-colors"
+                        style={{ left, width }}
+                        onClick={() => toast.info(`Social post: ${post.title}`)}
+                        title={post.title}
+                      >
+                        <Smartphone size={10} className="shrink-0 text-primary/60" />
+                        <span className="text-[10px] text-primary/80 font-medium truncate">
+                          {post.title}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+
+      {/* Task Detail Panel */}
+      <TaskDetailPanel
+        task={selectedTask}
+        allTasks={tasks.map((t) => ({ id: t.id, title: t.title }))}
+        open={panelOpen}
+        onClose={() => setPanelOpen(false)}
+        onSave={handleTaskSave}
+        onDelete={handleTaskDelete}
+        onComplete={handleTaskComplete}
+      />
+    </>
   );
 }
