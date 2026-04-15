@@ -30,7 +30,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
+  const ADMIN_EMAIL = "shane@tophatprovisions.com";
+
+  const fetchProfile = async (userId: string, email?: string) => {
+    if (email?.toLowerCase() === ADMIN_EMAIL) {
+      setProfile({
+        full_name: "Shane",
+        business_name: "Top Hat Provisions",
+        approved: true,
+        environment: "production",
+        is_admin: true,
+        api_keys_connected: false,
+      });
+      return;
+    }
     const { data } = await supabase
       .from("profiles")
       .select("full_name, business_name, approved, environment, is_admin, api_keys_connected")
@@ -51,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          setTimeout(() => fetchProfile(session.user.id), 0);
+          setTimeout(() => fetchProfile(session.user.id, session.user.email ?? undefined), 0);
         } else {
           setProfile(null);
         }
@@ -63,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        fetchProfile(session.user.id, session.user.email ?? undefined);
       }
       setLoading(false);
     });
