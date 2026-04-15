@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import TaskDetailPanel, { type TaskDetail, type TaskStatus } from "@/components/dashboard/TaskDetailPanel";
+import SocialDetailPanel, { type SocialPostDetail } from "@/components/dashboard/SocialDetailPanel";
 
 // --- Types ---
 
@@ -117,6 +118,10 @@ export default function CalendarTimeline() {
   // Task detail panel state
   const [selectedTask, setSelectedTask] = useState<TaskDetail | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
+
+  // Social detail panel state
+  const [selectedSocialPost, setSelectedSocialPost] = useState<SocialPostDetail | null>(null);
+  const [socialPanelOpen, setSocialPanelOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("timeline-show-social", String(showSocial));
