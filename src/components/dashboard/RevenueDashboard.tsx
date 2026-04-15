@@ -1,4 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import RefreshIndicator from "@/components/dashboard/RefreshIndicator";
 import {
   ChevronDown,
   ChevronRight,
@@ -312,6 +314,7 @@ function ChannelCard({ ch, onDrill }: { ch: ChannelData; onDrill: () => void }) 
 export default function RevenueDashboard() {
   const [expanded, setExpanded] = useState(true);
   const [drillChannel, setDrillChannel] = useState<string | null>(null);
+  const revenueRefresh = useAutoRefresh({ intervalMs: 5 * 60 * 1000 });
 
   const totalRevenue = CHANNELS.reduce((s, c) => s + c.revenueMTD, 0);
   const grossMargin = 51;
@@ -322,12 +325,15 @@ export default function RevenueDashboard() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-2">
-        {expanded ? <ChevronDown size={16} className="text-muted-foreground" /> : <ChevronRight size={16} className="text-muted-foreground" />}
-        <DollarSign size={16} className="text-[hsl(var(--success))]" />
-        <h2 className="text-sm font-semibold text-foreground">Revenue Overview</h2>
-        <Badge variant="secondary" className="text-[10px]">{fmt(totalRevenue)} MTD</Badge>
-      </button>
+      <div className="flex items-center justify-between">
+        <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-2">
+          {expanded ? <ChevronDown size={16} className="text-muted-foreground" /> : <ChevronRight size={16} className="text-muted-foreground" />}
+          <DollarSign size={16} className="text-[hsl(var(--success))]" />
+          <h2 className="text-sm font-semibold text-foreground">Revenue Overview</h2>
+          <Badge variant="secondary" className="text-[10px]">{fmt(totalRevenue)} MTD</Badge>
+        </button>
+        <RefreshIndicator agoLabel={revenueRefresh.agoLabel} isRefreshing={revenueRefresh.isRefreshing} onRefresh={revenueRefresh.refresh} intervalLabel="5 min" />
+      </div>
 
       {expanded && (
         <>
