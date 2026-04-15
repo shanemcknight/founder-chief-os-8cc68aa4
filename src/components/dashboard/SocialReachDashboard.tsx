@@ -358,7 +358,7 @@ export default function SocialReachDashboard() {
           <h2 className="text-sm font-semibold text-foreground">Social Reach</h2>
           <Badge variant="secondary" className="text-[10px]">12.4K reach</Badge>
         </button>
-        <RefreshIndicator agoLabel={socialRefresh.agoLabel} isRefreshing={socialRefresh.isRefreshing} onRefresh={socialRefresh.refresh} intervalLabel="2 min" />
+        <RefreshIndicator agoLabel={socialRefresh.agoLabel} isRefreshing={socialRefresh.isRefreshing} onRefresh={socialRefresh.refresh} intervalLabel="1 hour" />
       </div>
 
       {expanded && (
