@@ -756,7 +756,8 @@ export default function InboxMailPage() {
                 </div>
               </button>
             );
-          })}
+          })
+          )}
         </div>
       </div>
 
