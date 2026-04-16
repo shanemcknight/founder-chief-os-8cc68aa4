@@ -200,6 +200,11 @@ export default function AgentsChatPage() {
       { conversationId: convId!, agentId: activeAgent.id, agentName: activeAgent.name, message: userMsgText },
       {
         onDelta: (chunk) => setStreamBuffer((prev) => prev + chunk),
+        onWarning: (w) => {
+          setWarning(w);
+          if (w.level === "low") setLowDismissed(false);
+        },
+        onBlocked: (b) => setBlocked(b),
         onError: (err) => {
           toast.error(err.message);
           setStreaming(false);
