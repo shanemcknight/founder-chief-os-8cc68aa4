@@ -21,6 +21,7 @@ export default function DashboardLayout() {
   const [showChief, setShowChief] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const location = useLocation();
+  useOnboardingRedirect();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
