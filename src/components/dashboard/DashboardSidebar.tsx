@@ -207,10 +207,64 @@ export default function DashboardSidebar() {
           </div>
         )}
 
+        {/* AGENTS — expandable */}
+        <button
+          onClick={() => setAgentsOpen(!agentsOpen)}
+          className={cn(
+            "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors duration-150",
+            isAgentsActive
+              ? "text-primary bg-primary/10"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          )}
+        >
+          <Brain size={16} />
+          <span className="flex-1 text-left">AGENTS</span>
+          <ChevronRight size={14} className={cn("opacity-50 transition-transform duration-200", agentsOpen && "rotate-90")} />
+        </button>
+
+        {showAgentsSub && (
+          <div className="ml-3 pl-3 border-l border-border/40 space-y-0.5 py-1">
+            {agentsSubItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = item.exact
+                ? location.pathname === item.path
+                : location.pathname === item.path;
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  end={item.exact}
+                  className={cn(
+                    "flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[13px] transition-colors duration-150",
+                    isActive
+                      ? "text-primary bg-primary/10 font-medium border-l-2 border-primary -ml-[2px] pl-[10px]"
+                      : "text-muted-foreground/70 hover:text-foreground hover:bg-muted/30"
+                  )}
+                >
+                  <Icon size={14} />
+                  <span className="flex-1">{item.label}</span>
+                  {item.badge > 0 && (
+                    <span
+                      className={cn(
+                        "text-[9px] font-bold px-1.5 py-0.5 rounded-full min-w-[16px] text-center",
+                        item.badgeStyle === "destructive"
+                          ? "bg-destructive/15 text-destructive"
+                          : "bg-primary/15 text-primary"
+                      )}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </NavLink>
+              );
+            })}
+          </div>
+        )}
+
         {/* Rest of main nav */}
         {mainNavAfterInbox.map((item) => {
           const Icon = item.icon;
-          const isActive = location.pathname.startsWith(item.path);
+          const isActive = location.pathname === item.path;
           return (
             <NavLink key={item.path} to={item.path} className={linkClass(isActive)}>
               <Icon size={16} />
