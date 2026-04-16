@@ -497,48 +497,150 @@ export default function InboxMailPage() {
 
   return (
     <div className="flex h-full -m-6">
-      {/* Column 1 — Category Sidebar */}
+      {/* Column 1 — Sidebar (Categories or Accounts) */}
       <div className="w-[200px] shrink-0 border-r border-border flex flex-col overflow-y-auto">
+        {/* View mode toggle */}
         <div className="p-3 pb-2">
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Categories</p>
+          <div className="bg-muted/40 rounded-lg p-0.5 flex gap-0.5 w-full">
+            <button
+              onClick={() => {
+                setViewMode("priority");
+                setSelectedId(null);
+              }}
+              className={cn(
+                "flex-1 text-center text-xs px-3 py-1.5 rounded-md transition-colors",
+                viewMode === "priority"
+                  ? "bg-primary text-primary-foreground font-semibold"
+                  : "text-muted-foreground hover:text-foreground cursor-pointer"
+              )}
+            >
+              Priority
+            </button>
+            <button
+              onClick={() => {
+                setViewMode("account");
+                setSelectedId(null);
+              }}
+              className={cn(
+                "flex-1 text-center text-xs px-3 py-1.5 rounded-md transition-colors",
+                viewMode === "account"
+                  ? "bg-primary text-primary-foreground font-semibold"
+                  : "text-muted-foreground hover:text-foreground cursor-pointer"
+              )}
+            >
+              By Account
+            </button>
+          </div>
         </div>
-        <nav className="px-2 space-y-0.5 flex-1">
-          {categories.map((cat) => {
-            if (cat.key === "divider") return <div key="div" className="border-t border-border my-2" />;
-            const isActive = selectedCategory === cat.key;
-            const count = catCounts[cat.key] || 0;
-            const Icon = cat.icon!;
-            return (
-              <button
-                key={cat.key}
-                onClick={() => {
-                  setSelectedCategory(cat.key);
-                  setSelectedId(null);
-                }}
-                className={cn(
-                  "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors duration-150",
-                  isActive
-                    ? "text-foreground bg-[#B54165]/10 border-l-2 border-[#B54165] -ml-[2px] pl-[12px]"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
-                )}
+
+        {viewMode === "priority" ? (
+          <>
+            <div className="px-3 pb-2">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Categories</p>
+            </div>
+            <nav className="px-2 space-y-0.5 flex-1">
+              {categories.map((cat) => {
+                if (cat.key === "divider") return <div key="div" className="border-t border-border my-2" />;
+                const isActive = selectedCategory === cat.key;
+                const count = catCounts[cat.key] || 0;
+                const Icon = cat.icon!;
+                return (
+                  <button
+                    key={cat.key}
+                    onClick={() => {
+                      setSelectedCategory(cat.key);
+                      setSelectedId(null);
+                    }}
+                    className={cn(
+                      "w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] transition-colors duration-150",
+                      isActive
+                        ? "text-foreground bg-[#B54165]/10 border-l-2 border-[#B54165] -ml-[2px] pl-[12px]"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                    )}
+                  >
+                    <Icon size={14} />
+                    <span className="flex-1 text-left">{cat.label}</span>
+                    {count > 0 && (
+                      <span className="text-[10px] font-medium text-muted-foreground">{count}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </>
+        ) : (
+          <>
+            <div className="px-3 pt-3 pb-1">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Your Inboxes</p>
+            </div>
+            <nav className="px-2 space-y-0.5 flex-1">
+              {emailAccounts.length === 0 ? (
+                <div className="px-2.5 py-3">
+                  <p className="text-[11px] text-muted-foreground">No inboxes connected yet.</p>
+                </div>
+              ) : (
+                emailAccounts.map((account: any) => {
+                  const isActive = selectedAccountId === account.id;
+                  const unread = accountUnreadCounts[account.id] || 0;
+                  return (
+                    <button
+                      key={account.id}
+                      onClick={() => {
+                        setSelectedAccountId(account.id);
+                        setSelectedId(null);
+                      }}
+                      className={cn(
+                        "w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-md transition-colors cursor-pointer",
+                        isActive
+                          ? "text-primary bg-primary/10 border-l-2 border-primary -ml-[2px] pl-[10px]"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                      )}
+                    >
+                      {account.provider === "gmail" ? (
+                        <span className="w-3.5 h-3.5 rounded-full bg-red-500 flex items-center justify-center shrink-0">
+                          <span className="text-white text-[7px] font-bold">G</span>
+                        </span>
+                      ) : (
+                        <Mail size={14} className="shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0 text-left">
+                        <p className="text-xs font-medium truncate">{account.email_address}</p>
+                        {account.last_synced_at && (
+                          <p className="text-[10px] text-muted-foreground truncate">
+                            {formatSyncAge(account.last_synced_at)}
+                          </p>
+                        )}
+                      </div>
+                      {unread > 0 && (
+                        <span className="text-[10px] font-semibold bg-primary/20 text-primary px-1.5 py-0.5 rounded shrink-0">
+                          {unread}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })
+              )}
+              <div className="border-t border-border my-2" />
+              <Link
+                to="/settings"
+                className="w-full flex items-center gap-1.5 text-[11px] text-primary px-2.5 py-2 hover:bg-muted/30 rounded-md transition-colors"
               >
-                <Icon size={14} />
-                <span className="flex-1 text-left">{cat.label}</span>
-                {count > 0 && (
-                  <span className="text-[10px] font-medium text-muted-foreground">{count}</span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
+                <PlusCircle size={14} />
+                Connect Another Inbox
+              </Link>
+            </nav>
+          </>
+        )}
       </div>
 
       {/* Column 2 — Email List */}
       <div className="w-[340px] shrink-0 border-r border-border flex flex-col overflow-hidden">
         <div className="p-3 border-b border-border flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-bold text-foreground">
-              {categories.find((c) => c.key === selectedCategory)?.label || "All Mail"}
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground truncate">
+              {viewMode === "account"
+                ? selectedAccount?.email_address || "Select an inbox"
+                : categories.find((c) => c.key === selectedCategory)?.label || "All Mail"}
             </h2>
             {lastSyncedAt && (
               <p className="text-[10px] text-muted-foreground mt-0.5">
@@ -546,7 +648,7 @@ export default function InboxMailPage() {
               </p>
             )}
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={openCompose}
               className="flex items-center gap-1 text-[10px] font-semibold text-foreground border border-border px-2 py-1 rounded hover:bg-muted/30 transition-colors"
@@ -555,19 +657,36 @@ export default function InboxMailPage() {
               Compose
             </button>
             <button
-              onClick={() => triggerSync()}
+              onClick={() => triggerSync(viewMode === "account" ? selectedAccountId ?? undefined : undefined)}
               disabled={syncing}
               className="flex items-center gap-1 text-[10px] font-semibold text-primary border border-primary/30 px-2 py-1 rounded hover:bg-primary/10 transition-colors disabled:opacity-50"
             >
               {syncing ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
-              Sync
+              {viewMode === "account" ? "Sync This" : "Sync All"}
             </button>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto">
-          {filtered.map((email: any) => {
+          {viewMode === "account" && emailAccounts.length === 0 ? (
+            <div className="p-4">
+              <div className="bg-card border border-border rounded-lg p-4 text-center">
+                <p className="text-xs text-foreground mb-2">No inboxes connected yet.</p>
+                <p className="text-[11px] text-muted-foreground mb-3">
+                  Connect Outlook or Gmail in Settings.
+                </p>
+                <Link
+                  to="/settings"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary border border-primary px-2.5 py-1 rounded hover:bg-primary/10 transition-colors"
+                >
+                  Go to Settings
+                </Link>
+              </div>
+            </div>
+          ) : (
+            filtered.map((email: any) => {
             const isSelected = email.id === selected?.id;
             const isUnread = !email.read;
+            const showAccountBadge = viewMode === "priority" && emailAccounts.length > 1 && email.account_email;
             return (
               <button
                 key={email.id}
@@ -594,6 +713,11 @@ export default function InboxMailPage() {
                       <span className={cn("text-xs truncate", isUnread ? "font-bold text-foreground" : "font-medium text-foreground/80")}>
                         {email.from_name}
                       </span>
+                      {showAccountBadge && (
+                        <span className="text-[9px] font-medium bg-muted/50 text-muted-foreground px-1.5 py-0.5 rounded shrink-0">
+                          {email.account_email.length > 10 ? email.account_email.slice(0, 10) + "…" : email.account_email}
+                        </span>
+                      )}
                       <span className="ml-auto text-[10px] text-muted-foreground shrink-0">
                         {formatTime(email.received_at || email.created_at)}
                       </span>
