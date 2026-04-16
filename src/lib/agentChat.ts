@@ -1,13 +1,29 @@
 // Client-side streaming helper for the agent-chat edge function.
 // Calls the SSE endpoint and emits each delta token via onDelta.
+// Also surfaces token-gating signals: onWarning (low/critical) and onBlocked (budget exceeded).
 
 import { supabase } from "@/integrations/supabase/client";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/agent-chat`;
 
+export type ChatWarning = { level: "low" | "critical"; percent: number };
+export type ChatBlocked = {
+  message: string;
+  tokens_used: number;
+  token_budget: number;
+  upgrade_url: string;
+  byok_url: string;
+};
+
 export async function streamAgentChat(
   body: { conversationId: string; agentId: string; agentName: string; message: string },
-  callbacks: { onDelta: (text: string) => void; onError?: (err: Error) => void; onDone: () => void },
+  callbacks: {
+    onDelta: (text: string) => void;
+    onError?: (err: Error) => void;
+    onWarning?: (w: ChatWarning) => void;
+    onBlocked?: (b: ChatBlocked) => void;
+    onDone: () => void;
+  },
 ): Promise<void> {
   const { data: sessionData } = await supabase.auth.getSession();
   const token = sessionData?.session?.access_token;
@@ -34,6 +50,17 @@ export async function streamAgentChat(
     let msg = `Request failed (${resp.status})`;
     try {
       const j = await resp.json();
+      if (j?.error === "token_budget_exceeded") {
+        callbacks.onBlocked?.({
+          message: j.message,
+          tokens_used: j.tokens_used,
+          token_budget: j.token_budget,
+          upgrade_url: j.upgrade_url,
+          byok_url: j.byok_url,
+        });
+        callbacks.onDone();
+        return;
+      }
       if (j?.error) msg = j.error;
     } catch { /* ignore */ }
     callbacks.onError?.(new Error(msg));
@@ -45,6 +72,7 @@ export async function streamAgentChat(
   const decoder = new TextDecoder();
   let buf = "";
   let done = false;
+  let currentEvent: string | null = null;
 
   while (!done) {
     const { done: streamDone, value } = await reader.read();
@@ -55,7 +83,15 @@ export async function streamAgentChat(
       let line = buf.slice(0, nl);
       buf = buf.slice(nl + 1);
       if (line.endsWith("\r")) line = line.slice(0, -1);
-      if (line.startsWith(":") || !line.trim()) continue;
+      if (line.startsWith(":")) continue;
+      if (!line.trim()) {
+        currentEvent = null;
+        continue;
+      }
+      if (line.startsWith("event: ")) {
+        currentEvent = line.slice(7).trim();
+        continue;
+      }
       if (!line.startsWith("data: ")) continue;
       const json = line.slice(6).trim();
       if (json === "[DONE]") {
@@ -64,6 +100,10 @@ export async function streamAgentChat(
       }
       try {
         const parsed = JSON.parse(json);
+        if (currentEvent === "meta") {
+          if (parsed.warning) callbacks.onWarning?.(parsed.warning);
+          continue;
+        }
         const c = parsed.choices?.[0]?.delta?.content as string | undefined;
         if (c) callbacks.onDelta(c);
       } catch {
