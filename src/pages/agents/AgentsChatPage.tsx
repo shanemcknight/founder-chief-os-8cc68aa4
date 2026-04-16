@@ -565,41 +565,69 @@ export default function AgentsChatPage() {
               )}
             </div>
 
-            {/* Input */}
-            <div className="border-t border-border px-4 py-3">
-              <div className="flex gap-2 items-end">
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSend();
-                    }
-                  }}
-                  placeholder={`Message ${activeAgent.name}...`}
-                  disabled={streaming}
-                  className="flex-1 bg-background border border-border rounded-xl px-3 py-2.5 text-xs placeholder:text-muted-foreground resize-none min-h-[40px] max-h-[120px] overflow-y-auto focus:outline-none focus:ring-1 focus:ring-primary text-foreground disabled:opacity-60"
-                  rows={1}
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={streaming || !input.trim()}
-                  className="bg-primary text-primary-foreground p-2.5 rounded-xl hover:bg-primary/90 transition-colors duration-150 disabled:opacity-40"
-                >
-                  <Send size={14} />
-                </button>
-              </div>
-              <div className="flex items-center justify-between mt-2">
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Paperclip size={11} />
-                  <span className="text-[10px]">Attach context</span>
+            {/* Input — replaced with friendly block when token budget exceeded */}
+            {blocked ? (
+              <div className="border-t border-border px-4 py-4">
+                <div className="bg-card border border-border rounded-xl p-6 text-center">
+                  <Zap size={24} className="text-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm font-semibold text-foreground">
+                    You've used all your tokens for {new Date().toLocaleString("en-US", { month: "long" })}.
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Your tokens reset next month. Upgrade your plan or connect your own API key to keep chatting.
+                  </p>
+                  <div className="flex items-center justify-center gap-2 mt-4">
+                    <Link
+                      to={blocked.upgrade_url || "/pricing"}
+                      className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-xs font-semibold hover:bg-primary/90 transition-colors duration-150"
+                    >
+                      Upgrade Plan
+                    </Link>
+                    <Link
+                      to={blocked.byok_url || "/settings"}
+                      className="border border-border text-foreground px-4 py-2 rounded-lg text-xs hover:bg-muted/30 transition-colors duration-150"
+                    >
+                      Connect API Key
+                    </Link>
+                  </div>
                 </div>
-                <span className="text-[10px] text-muted-foreground">
-                  {streaming ? "Streaming..." : `${thread.length} message${thread.length === 1 ? "" : "s"}`}
-                </span>
               </div>
-            </div>
+            ) : (
+              <div className="border-t border-border px-4 py-3">
+                <div className="flex gap-2 items-end">
+                  <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend();
+                      }
+                    }}
+                    placeholder={`Message ${activeAgent.name}...`}
+                    disabled={streaming}
+                    className="flex-1 bg-background border border-border rounded-xl px-3 py-2.5 text-xs placeholder:text-muted-foreground resize-none min-h-[40px] max-h-[120px] overflow-y-auto focus:outline-none focus:ring-1 focus:ring-primary text-foreground disabled:opacity-60"
+                    rows={1}
+                  />
+                  <button
+                    onClick={handleSend}
+                    disabled={streaming || !input.trim()}
+                    className="bg-primary text-primary-foreground p-2.5 rounded-xl hover:bg-primary/90 transition-colors duration-150 disabled:opacity-40"
+                  >
+                    <Send size={14} />
+                  </button>
+                </div>
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <Paperclip size={11} />
+                    <span className="text-[10px]">Attach context</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">
+                    {streaming ? "Streaming..." : `${thread.length} message${thread.length === 1 ? "" : "s"}`}
+                  </span>
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
