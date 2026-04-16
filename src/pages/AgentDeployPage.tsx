@@ -7,10 +7,10 @@ import { supabase } from "@/integrations/supabase/client";
 const stepLabels = ["Choose Model", "Configure", "Connect Integrations", "Choose Channels"];
 
 const models = [
-  { name: "GPT-4o", desc: "Best for email, outreach, and complex reasoning", latency: "~40ms", cost: "$$", badge: null },
-  { name: "Claude 3.5 Sonnet", desc: "Best for long-form content, nuanced writing, publishing", latency: "~55ms", cost: "$$", badge: null },
-  { name: "Gemini Pro", desc: "Best for research, data analysis, multi-step tasks", latency: "~48ms", cost: "$", badge: null },
-  { name: "Llama 3 (Local)", desc: "Runs on your own hardware via MYTHOS Node. Private, fast, free.", latency: "~12ms", cost: "Free", badge: "OLYMPUS" },
+  { name: "GPT-4o", provider: "OpenAI", desc: "Best for email, outreach, and complex reasoning", latency: "~40ms", cost: "$$", badge: null },
+  { name: "Claude 3.5 Sonnet", provider: "Anthropic", desc: "Best for long-form content, nuanced writing, publishing", latency: "~55ms", cost: "$$", badge: null },
+  { name: "Gemini Pro", provider: "Google", desc: "Best for research, data analysis, multi-step tasks", latency: "~48ms", cost: "$", badge: null },
+  { name: "Llama 3 (Local)", provider: "Local", desc: "Runs on your own hardware via MYTHOS Node. Private, fast, free.", latency: "~12ms", cost: "Free", badge: "OLYMPUS" },
 ];
 
 const integrationsList = [
