@@ -378,6 +378,29 @@ export default function AgentsChatPage() {
             </div>
 
             <div ref={threadRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+              {/* Critical token banner — pinned at top of thread, not dismissable */}
+              {warning?.level === "critical" && !blocked && (
+                <div className="bg-warning/10 border border-warning/30 rounded-lg px-3 py-2 text-xs text-warning flex items-center gap-2 flex-wrap">
+                  <span className="flex-1 min-w-[180px]">Running low on tokens this month. Upgrade or connect your API key to keep going.</span>
+                  <Link to="/pricing" className="font-semibold underline hover:no-underline">Upgrade →</Link>
+                  <Link to="/settings" className="font-semibold underline hover:no-underline">Connect Key →</Link>
+                </div>
+              )}
+              {/* Low usage system message — dismissable, shown once per session */}
+              {warning?.level === "low" && !lowDismissed && !blocked && (
+                <div className="flex items-center justify-center gap-1.5 text-[10px] text-muted-foreground italic">
+                  <span>You've used {Math.round(warning.percent)}% of your monthly tokens.</span>
+                  <Link to="/settings" className="text-primary not-italic font-medium hover:underline">Connect key →</Link>
+                  <button
+                    onClick={() => setLowDismissed(true)}
+                    className="text-muted-foreground hover:text-foreground ml-1"
+                    aria-label="Dismiss"
+                  >
+                    <X size={10} />
+                  </button>
+                </div>
+              )}
+
               {loadingThread && <p className="text-xs text-muted-foreground italic text-center">Loading...</p>}
               {!loadingThread && thread.length === 0 && (
                 <p className="text-xs text-muted-foreground italic text-center">No messages yet. Say hi to {activeAgent.name}.</p>
