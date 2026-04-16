@@ -171,13 +171,20 @@ export default function AgentDeployPage() {
                   {hasByokKey ? (
                     <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                       <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />
-                      <span className="text-[11px] text-emerald-400 font-medium">✓ Using your Anthropic API key — all models unlocked</span>
+                      <span className="text-[11px] text-emerald-400 font-medium">✓ Using your API key — all models unlocked</span>
                     </div>
                   ) : (
                     <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg border" style={{ borderColor: "#5D9992", backgroundColor: "rgba(93,153,146,0.06)" }}>
                       <Info size={14} className="shrink-0 mt-0.5" style={{ color: "#5D9992" }} />
                       <p className="text-[11px] text-muted-foreground leading-relaxed">
-                        <span className="font-semibold text-foreground">Unlock all models</span> — Connect your Anthropic API key in{" "}
+                        <span className="font-semibold text-foreground">Unlock all models</span> —{" "}
+                        {(() => {
+                          const selected = models.find((m) => m.name === selectedModel);
+                          const provider = selected && selected.provider !== "Local" ? selected.provider : null;
+                          return provider
+                            ? `Connect your ${provider} API key for this model in `
+                            : "Connect your API key for this model in ";
+                        })()}
                         <Link to="/settings" className="font-medium underline underline-offset-2" style={{ color: "#5D9992" }}>
                           Settings → Integrations
                         </Link>{" "}
