@@ -80,8 +80,10 @@ export default function DashboardSidebar() {
 
   const isSocialActive = location.pathname.startsWith("/social");
   const isInboxActive = location.pathname.startsWith("/inbox");
+  const isAgentsActive = location.pathname.startsWith("/agents");
   const [socialOpen, setSocialOpen] = useState(isSocialActive);
   const [inboxOpen, setInboxOpen] = useState(isInboxActive);
+  const [agentsOpen, setAgentsOpen] = useState(isAgentsActive);
 
   const displayName = profile?.full_name || user?.email?.split("@")[0] || "User";
   const initials = displayName
@@ -93,6 +95,7 @@ export default function DashboardSidebar() {
 
   const showSocialSub = socialOpen;
   const showInboxSub = inboxOpen;
+  const showAgentsSub = agentsOpen;
 
   return (
     <aside className="w-[220px] shrink-0 border-r border-border bg-card flex flex-col overflow-y-auto">
