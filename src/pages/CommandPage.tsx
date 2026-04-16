@@ -184,27 +184,6 @@ export default function CommandPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <div className="flex items-center gap-2">
-          <h1 className="text-xl md:text-[22px] font-bold text-foreground">Good morning, {displayName}.</h1>
-          {isSandbox && (
-            <span className="text-[9px] font-bold bg-warning/20 text-warning border border-warning/40 px-1.5 py-0.5 rounded">
-              SANDBOX
-            </span>
-          )}
-          {isProduction && (
-            <span className="text-[9px] font-bold bg-success/20 text-success border border-success/40 px-1.5 py-0.5 rounded">
-              LIVE
-            </span>
-          )}
-        </div>
-        <p className="text-[13px] text-muted-foreground mt-1">
-          {isSandbox
-            ? "7 agents active · 3 items need your attention · Mock data mode"
-            : `${realCount} items need your attention · Updated just now`}
-        </p>
-      </div>
-
       {/* KPI Cards — clickable to open modals */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {kpis.map((kpi) => (
