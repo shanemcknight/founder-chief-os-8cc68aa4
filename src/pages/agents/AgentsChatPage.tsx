@@ -78,6 +78,11 @@ export default function AgentsChatPage() {
   const [openSections, setOpenSections] = useState({ data: true, reasoning: false, confidence: true });
   const [search, setSearch] = useState("");
 
+  // Token-gating UI state. BYOK users never receive these signals so they stay null.
+  const [warning, setWarning] = useState<ChatWarning | null>(null);
+  const [blocked, setBlocked] = useState<ChatBlocked | null>(null);
+  const [lowDismissed, setLowDismissed] = useState(false);
+
   const threadRef = useRef<HTMLDivElement>(null);
 
   const fetchConversations = useCallback(async () => {
