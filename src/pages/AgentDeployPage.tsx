@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { X, Sparkles, Info, CheckCircle2, Upload } from "lucide-react";
+import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -52,6 +53,7 @@ export default function AgentDeployPage() {
   });
   const [systemPrompt, setSystemPrompt] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importedFileName, setImportedFileName] = useState("");
   const navigate = useNavigate();
 
   const handleImportSoul = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,7 +62,11 @@ export default function AgentDeployPage() {
     const reader = new FileReader();
     reader.onload = (ev) => {
       const text = ev.target?.result;
-      if (typeof text === "string") setSystemPrompt(text);
+      if (typeof text === "string") {
+        setSystemPrompt(text);
+        setImportedFileName(file.name);
+        toast.success("Agent instructions imported");
+      }
     };
     reader.readAsText(file);
     e.target.value = "";
@@ -257,9 +263,9 @@ export default function AgentDeployPage() {
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="flex items-center gap-1.5 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors px-2 py-1 rounded-md border border-primary/30 hover:border-primary/50 bg-primary/5"
+                        className="border border-border text-[11px] font-medium text-muted-foreground px-3 py-1.5 rounded-md hover:bg-muted/30 hover:text-foreground flex items-center gap-1.5 transition-colors cursor-pointer"
                       >
-                        <Upload size={11} />
+                        <Upload size={12} />
                         Import soul.md
                       </button>
                       <input
@@ -270,7 +276,9 @@ export default function AgentDeployPage() {
                         onChange={handleImportSoul}
                       />
                     </div>
-                    <p className="text-[10px] text-muted-foreground mb-2">Have an existing agent? Import their instruction file to pre-fill the prompt.</p>
+                    <p className="text-[11px] text-muted-foreground mb-2 mt-1">
+                      Have an existing agent? Import their soul.md or instruction file to auto-fill this prompt.
+                    </p>
                     <textarea
                       rows={6}
                       value={systemPrompt}
@@ -278,6 +286,12 @@ export default function AgentDeployPage() {
                       placeholder="Describe your agent's role, tone, and instructions. Example: You are Chief's email assistant. You read incoming emails, score them by priority, and draft responses in Shane's voice — warm, direct, and always ending with 'Have the best day of your life.'"
                       className="w-full bg-background border border-border rounded-lg p-3 text-xs text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-1 focus:ring-primary/50"
                     />
+                    {importedFileName && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <CheckCircle2 size={10} className="text-success" />
+                        <span className="text-[10px] text-success">Imported from {importedFileName}</span>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-2">
