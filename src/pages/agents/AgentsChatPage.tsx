@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import {
-  Search, Download, Send, Paperclip, PlusCircle, ChevronRight, ChevronDown, X,
+  Search, Download, Send, Paperclip, PlusCircle, ChevronRight, ChevronDown, X, Zap,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AGENTS, type AgentName } from "@/lib/agents";
-import { streamAgentChat } from "@/lib/agentChat";
+import { streamAgentChat, type ChatWarning, type ChatBlocked } from "@/lib/agentChat";
 import { toast } from "sonner";
 
 type ConversationListItem = {
