@@ -172,9 +172,9 @@ export default function DashboardTopbar() {
                 <div className="py-1.5">
                   <p className="px-4 pt-1.5 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Your Account</p>
                   <MenuItem icon={User} label="Profile & Settings" onClick={() => closeAndNavigate("/settings")} />
-                  <MenuItem icon={Users} label="Team & Seats" onClick={() => closeAndNavigate("/settings")} />
-                  <MenuItem icon={CreditCard} label="Billing & Plan" onClick={() => closeAndNavigate("/settings")} />
-                  <MenuItem icon={Plug} label="Connected Integrations" onClick={() => closeAndNavigate("/settings")} />
+                  <MenuItem icon={Users} label="Team & Seats" onClick={() => closeAndNavigate("/settings?tab=team")} />
+                  <MenuItem icon={CreditCard} label="Billing & Plan" onClick={() => closeAndNavigate("/settings?tab=billing")} />
+                  <MenuItem icon={Plug} label="Connected Integrations" onClick={() => closeAndNavigate("/settings?tab=integrations")} />
                 </div>
 
                 <div className="mx-3 border-t border-border" />
@@ -183,9 +183,9 @@ export default function DashboardTopbar() {
                 <div className="py-1.5">
                   <p className="px-4 pt-1.5 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Your Workspace</p>
                   <MenuItem icon={Rocket} label="Deploy New Agent" onClick={() => closeAndNavigate("/agents/new")} />
-                  <MenuItem icon={UserPlus} label="Invite Beta Tester" onClick={() => { setShowUserMenu(false); /* handled by button */ }} />
-                  <MenuItem icon={Users} label="Manage Beta Testers" onClick={() => { setShowUserMenu(false); setShowBetaAdmin(true); }} />
-                  <MenuItem icon={Key} label="API Keys & Webhooks" onClick={() => closeAndNavigate("/settings")} />
+                  <MenuItem icon={UserPlus} label="Invite Beta Tester" onClick={() => closeAndNavigate("/beta")} />
+                  <MenuItem icon={Users} label="Manage Beta Testers" onClick={() => closeAndNavigate("/beta")} />
+                  <MenuItem icon={Key} label="API Keys & Webhooks" onClick={() => closeAndNavigate("/settings?tab=api")} />
                 </div>
 
                 <div className="mx-3 border-t border-border" />
@@ -193,19 +193,9 @@ export default function DashboardTopbar() {
                 {/* Section 3 — Help & Support */}
                 <div className="py-1.5">
                   <p className="px-4 pt-1.5 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Help & Support</p>
-                  <a
-                    href="https://docs.mythoshq.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2.5 px-4 py-1.5 text-[11px] text-foreground hover:bg-muted/40 transition-colors cursor-pointer"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    <BookOpen size={13} className="text-muted-foreground shrink-0" />
-                    Documentation
-                    <span className="ml-auto text-[9px] text-muted-foreground">↗</span>
-                  </a>
-                  <MenuItem icon={Sparkles} label="What's New / Changelog" onClick={() => { setShowUserMenu(false); }} />
-                  <MenuItem icon={MessageSquare} label="Send Feedback" onClick={() => { setShowUserMenu(false); setShowFeedback(true); }} />
+                  <MenuItem icon={BookOpen} label="Documentation" onClick={() => { setShowUserMenu(false); window.open("https://mythoshq.io", "_blank"); }} />
+                  <MenuItem icon={Sparkles} label="What's New / Changelog" onClick={() => { setShowUserMenu(false); window.open("https://mythoshq.io", "_blank"); }} />
+                  <MenuItem icon={MessageSquare} label="Send Feedback" onClick={() => { setShowUserMenu(false); window.open("mailto:hello@mythoshq.io?subject=MythosHQ Feedback", "_blank"); }} />
                   <MenuItem icon={MessageSquare} label="Support" onClick={() => closeAndNavigate("/support")} />
                 </div>
 
