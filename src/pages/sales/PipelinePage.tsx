@@ -1,5 +1,6 @@
 import { useState, useMemo, DragEvent } from "react";
-import { MapPin, Clock, Search, Plus } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { MapPin, Clock, Search, Plus, X } from "lucide-react";
 import { useCrm, STAGES, Stage } from "@/contexts/CrmContext";
 import { cn } from "@/lib/utils";
 
