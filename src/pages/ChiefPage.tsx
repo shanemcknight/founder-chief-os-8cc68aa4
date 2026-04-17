@@ -79,8 +79,8 @@ export default function ChiefPage() {
       {/* LEFT — Today's Briefing */}
       <div className="flex flex-col min-h-0 overflow-y-auto pr-1 w-[220px] shrink-0">
         <div className="mb-4">
-          <h2 className="text-sm font-bold text-foreground">April 11, 2026</h2>
-          <p className="text-xs text-muted-foreground">Good morning, Shane.</p>
+          <h2 className="text-sm font-bold text-foreground">Today's Briefing from My HQ Agent</h2>
+          <p className="text-xs text-muted-foreground">April 11, 2026 · Good morning, Shane.</p>
         </div>
 
         <div className="space-y-2 mb-6">
