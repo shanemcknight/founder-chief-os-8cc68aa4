@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { MessageCircle, X, LayoutDashboard, Mail, BookOpen, Brain, MoreHorizontal } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardTopbar from "@/components/dashboard/DashboardTopbar";
 import RelayPanel from "@/components/dashboard/RelayPanel";
@@ -18,6 +19,7 @@ const mobileTabItems = [
 
 export default function DashboardLayout() {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const [showChief, setShowChief] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const location = useLocation();

@@ -206,7 +206,7 @@ export default function DashboardTopbar() {
                   </a>
                   <MenuItem icon={Sparkles} label="What's New / Changelog" onClick={() => { setShowUserMenu(false); }} />
                   <MenuItem icon={MessageSquare} label="Send Feedback" onClick={() => { setShowUserMenu(false); setShowFeedback(true); }} />
-                  <MenuItem icon={Brain} label="Talk to Chief" onClick={() => closeAndNavigate("/chief")} />
+                  <MenuItem icon={MessageSquare} label="Support" onClick={() => closeAndNavigate("/support")} />
                 </div>
 
                 <div className="mx-3 border-t border-border" />
