@@ -86,7 +86,7 @@ export default function CommandPage() {
   const ModalContent = activeModal ? MODAL_COMPONENTS[activeModal] : null;
 
   return (
-    <div className="flex flex-col h-full space-y-4">
+    <div className="flex flex-col h-full space-y-3">
       {/* Subtitle */}
       <p className="text-[11px] text-muted-foreground">
         {agentCount} agents active · Last sync just now
@@ -111,11 +111,10 @@ export default function CommandPage() {
         ))}
       </div>
 
-      <div className="flex-1 min-h-0">
+      <div className="space-y-3">
         <CalendarTimeline />
+        <ConnectedToolsGrid />
       </div>
-
-      <ConnectedToolsGrid />
 
       {/* Dashboard Modal Overlay */}
       {activeModal && ModalContent && (
