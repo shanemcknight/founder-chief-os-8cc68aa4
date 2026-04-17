@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   LayoutDashboard,
@@ -95,6 +95,7 @@ const linkClass = (isActive: boolean) =>
 
 export default function DashboardSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
   const inboxCounts = useInboxCounts();
 
@@ -417,10 +418,14 @@ export default function DashboardSidebar() {
           Deploy New
         </NavLink>
 
-        <NavLink to="/settings" className={linkClass(location.pathname === "/settings")}>
+        <button
+          type="button"
+          onClick={() => navigate("/settings")}
+          className={linkClass(location.pathname === "/settings") + " w-full text-left"}
+        >
           <Settings size={16} />
           Settings
-        </NavLink>
+        </button>
       </nav>
 
       <div className="p-3 border-t border-border">
