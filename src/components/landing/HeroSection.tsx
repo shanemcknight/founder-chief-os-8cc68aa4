@@ -248,6 +248,8 @@ export default function HeroSection() {
           </div>
         </div>
 
+        <LiveAgentActivity />
+
         <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 text-center border-t border-border pt-10">
           {([
             ["7", "Pillars"],
