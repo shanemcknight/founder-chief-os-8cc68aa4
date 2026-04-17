@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Check, Settings, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,20 +7,19 @@ import { useAuth } from "@/contexts/AuthContext";
 
 type Tab = "approvals" | "chat" | "activity";
 
+type PriorityKind = "HIGH" | "MED" | "FYI";
+type SourceKind = "approval" | "email";
+
 type Priority = {
   id: string;
   summary: string;
-  priority: "HIGH" | "MED" | "FYI";
+  priority: PriorityKind;
   actionType: string;
   createdAt: string;
-  isReal?: boolean;
+  source: SourceKind;
 };
 
-const seedPriorities: Priority[] = [
-  { id: "seed-1", summary: "Wholesale inquiry — Austin bar owner. Response drafted.", priority: "HIGH", actionType: "Email", createdAt: new Date(Date.now() - 2 * 60_000).toISOString() },
-  { id: "seed-2", summary: "LinkedIn post ready — scheduled 2pm", priority: "MED", actionType: "Social", createdAt: new Date(Date.now() - 25 * 60_000).toISOString() },
-  { id: "seed-3", summary: "Invoice #1042 overdue — $840 outstanding", priority: "MED", actionType: "Invoice", createdAt: new Date(Date.now() - 3 * 3600_000).toISOString() },
-];
+const priorityRank: Record<PriorityKind, number> = { HIGH: 0, MED: 1, FYI: 2 };
 
 const recentChats = [
   { title: "Wholesale Outreach — Whole Foods", preview: "Approve the Austin draft...", time: "2m ago" },
