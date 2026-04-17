@@ -136,11 +136,10 @@ export default function HeroSection() {
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-8 text-center border-t border-border pt-10">
+        <div className="mt-8 grid grid-cols-4 gap-8 text-center border-t border-border pt-10">
           {([
             ["7", "Pillars"],
             ["1-Click", "Approvals"],
-            ["$49/mo", "to start"],
             ["4", "Tiers"],
             ["1", "Agent Free"],
           ] as const).map(([val, label]) => (
@@ -149,6 +148,10 @@ export default function HeroSection() {
               <p className="text-sm text-muted-foreground">{label}</p>
             </div>
           ))}
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-2xl font-bold text-primary">$49/mo to start</p>
+          <p className="text-sm text-muted-foreground mt-1">No credit card required</p>
         </div>
       </div>
     </section>
