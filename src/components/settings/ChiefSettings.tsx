@@ -31,6 +31,8 @@ export default function ChiefSettings() {
   const [briefingTime, setBriefingTime] = useState("08:00");
   const [anthropicKey, setAnthropicKey] = useState("");
   const [savedKey, setSavedKey] = useState(false);
+  const [agentName, setAgentName] = useState("My HQ Agent");
+  const [savingName, setSavingName] = useState(false);
   const [autoApprove, setAutoApprove] = useState<Record<string, boolean>>({
     linkedin: false, email: false, expenses: false,
   });
@@ -40,16 +42,27 @@ export default function ChiefSettings() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("anthropic_api_key").eq("user_id", user.id).single().then(({ data }) => {
-      if (data?.anthropic_api_key) {
-        setAnthropicKey("••••••••••••" + data.anthropic_api_key.slice(-4));
+    supabase.from("profiles").select("anthropic_api_key, agent_name").eq("user_id", user.id).single().then(({ data }) => {
+      const d = data as any;
+      if (d?.anthropic_api_key) {
+        setAnthropicKey("••••••••••••" + d.anthropic_api_key.slice(-4));
         setSavedKey(true);
       }
+      if (d?.agent_name) setAgentName(d.agent_name);
     });
   }, [user]);
 
   const toggleAuto = (id: string) => setAutoApprove((prev) => ({ ...prev, [id]: !prev[id] }));
   const toggleNotif = (id: string) => setNotifChecks((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  const saveAgentName = async () => {
+    if (!user || !agentName.trim()) return;
+    setSavingName(true);
+    const { error } = await supabase.from("profiles").update({ agent_name: agentName.trim() } as any).eq("user_id", user.id);
+    setSavingName(false);
+    if (error) { toast.error("Failed to save agent name"); return; }
+    toast.success("Agent name updated");
+  };
 
   const saveAnthropicKey = async () => {
     if (!user || !anthropicKey || anthropicKey.startsWith("••")) return;
@@ -69,7 +82,30 @@ export default function ChiefSettings() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-bold text-foreground">Agent Settings</h2>
+      <h2 className="text-lg font-bold text-foreground">My HQ Agent Settings</h2>
+
+      {/* Agent Name */}
+      <div className="bg-card border border-border rounded-xl p-5">
+        <h3 className="text-sm font-bold text-foreground mb-3">Your agent's name</h3>
+        <div className="flex gap-2">
+          <input
+            value={agentName}
+            onChange={(e) => setAgentName(e.target.value)}
+            placeholder="My HQ Agent"
+            className="flex-1 bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+          />
+          <button
+            onClick={saveAgentName}
+            disabled={savingName}
+            className="text-xs font-semibold bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50"
+          >
+            {savingName ? "Saving..." : "Save"}
+          </button>
+        </div>
+        <p className="text-[11px] text-muted-foreground mt-2">
+          This is what your primary agent is called across your dashboard.
+        </p>
+      </div>
 
       {/* BYOK Anthropic Key */}
       <div className="bg-card border border-border rounded-xl p-5">
