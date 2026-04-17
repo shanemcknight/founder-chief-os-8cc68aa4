@@ -269,9 +269,25 @@ export default function AgentDeployPage() {
               {/* STEP 2 — Configure */}
               {step === 1 && (
                 <div className="space-y-4">
+                  {template && (
+                    <div className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg bg-success/10 border border-success/20">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <CheckCircle2 size={14} className="text-success shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-[11px] font-semibold text-success truncate">Template: {template.name}</p>
+                          <p className="text-[10px] text-muted-foreground">This template is pre-configured. Review and customize before deploying.</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div>
                     <label className="text-xs font-medium text-foreground block mb-1">Agent Name</label>
-                    <input defaultValue="My HQ Agent" placeholder="e.g. Email Manager, Social Publisher, Outreach Bot" className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50" />
+                    <input
+                      value={agentName}
+                      onChange={(e) => setAgentName(e.target.value)}
+                      placeholder="e.g. Email Manager, Social Publisher, Outreach Bot"
+                      className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+                    />
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-1">
