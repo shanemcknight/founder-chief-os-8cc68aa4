@@ -418,10 +418,14 @@ export default function DashboardSidebar() {
           Deploy New
         </NavLink>
 
-        <NavLink to="/settings" className={linkClass(location.pathname === "/settings")}>
+        <button
+          type="button"
+          onClick={() => navigate("/settings")}
+          className={linkClass(location.pathname === "/settings") + " w-full text-left"}
+        >
           <Settings size={16} />
           Settings
-        </NavLink>
+        </button>
       </nav>
 
       <div className="p-3 border-t border-border">
