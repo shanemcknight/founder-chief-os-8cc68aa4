@@ -36,6 +36,7 @@ import BetaInvitePage from "./pages/BetaInvitePage";
 import PricingPage from "./pages/PricingPage";
 import WhiteLabelPage from "./pages/WhiteLabelPage";
 import FoodPeoplePage from "./pages/FoodPeoplePage";
+import SupportPage from "./pages/SupportPage";
 
 // Social sub-pages
 import SocialLayout from "./pages/social/SocialLayout";
@@ -81,6 +82,7 @@ const App = () => (
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/white-label" element={<WhiteLabelPage />} />
             <Route path="/for/food-people" element={<FoodPeoplePage />} />
+            <Route path="/support" element={<SupportPage />} />
             <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
             <Route element={<ProtectedRoute><ReportsProvider><DashboardLayout /></ReportsProvider></ProtectedRoute>}>
               <Route path="/dashboard" element={<CommandPage />} />
