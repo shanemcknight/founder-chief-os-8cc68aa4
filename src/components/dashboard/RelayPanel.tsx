@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 type Tab = "approvals" | "chat" | "activity";
 
 type PriorityKind = "HIGH" | "MED" | "FYI";
-type SourceKind = "approval" | "email";
+type SourceKind = "approval" | "email" | "task";
 
 type Priority = {
   id: string;
