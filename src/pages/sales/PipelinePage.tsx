@@ -67,7 +67,18 @@ export default function PipelinePage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <h1 className="text-lg font-bold text-foreground">Pipeline</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-lg font-bold text-foreground">Pipeline</h1>
+          {stageLabel && (
+            <button
+              onClick={clearFilter}
+              className="flex items-center gap-1 text-[10px] font-semibold bg-primary/10 text-primary px-2 py-1 rounded-full hover:bg-primary/20 transition-colors"
+            >
+              {stageLabel}
+              <X size={10} />
+            </button>
+          )}
+        </div>
         <div className="flex items-center gap-2 flex-1 max-w-md">
           <div className="relative flex-1">
             <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
