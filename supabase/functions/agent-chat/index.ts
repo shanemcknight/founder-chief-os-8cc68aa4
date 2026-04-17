@@ -239,7 +239,7 @@ Deno.serve(async (req) => {
 
           // Persist agent message + proposal (best-effort, after stream ends)
           try {
-            const proposal = detectProposal(fullText);
+            const proposal = isDirect ? null : detectProposal(fullText);
             const cleanedText = proposal
               ? fullText.replace(/\[\[PROPOSE_ACTION[\s\S]*?\[\[\/PROPOSE_ACTION\]\]/i, "").trim() ||
                 `Drafted: ${proposal.summary}`
