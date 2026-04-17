@@ -56,6 +56,7 @@ import InboxActivityPage from "./pages/inbox/InboxActivityPage";
 // Reports sub-pages
 import ReportsLayout from "./pages/reports/ReportsLayout";
 import ReportsHomePage from "./pages/reports/ReportsHomePage";
+import { ReportsProvider } from "@/contexts/ReportsContext";
 import ReportsAnalyzePage from "./pages/reports/ReportsAnalyzePage";
 import ReportsLibraryPage from "./pages/reports/ReportsLibraryPage";
 import ReportsBuildPage from "./pages/reports/ReportsBuildPage";
