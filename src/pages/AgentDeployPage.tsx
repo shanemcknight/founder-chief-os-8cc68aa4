@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { X, Sparkles, Info, CheckCircle2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import type { AgentTemplate } from "./BuildPage";
 
 const stepLabels = ["Choose Model", "Configure", "Connect Integrations", "Choose Channels"];
 
@@ -36,11 +37,26 @@ const channels = [
 
 export default function AgentDeployPage() {
   const { user } = useAuth();
-  const [step, setStep] = useState(0);
+  const location = useLocation();
+  const template = (location.state as { template?: AgentTemplate } | null)?.template;
+
+  const [step, setStep] = useState(template ? 1 : 0);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
-  const [integrations, setIntegrations] = useState<Record<string, boolean>>(
-    Object.fromEntries(integrationsList.map((i) => [i.name, i.defaultOn]))
-  );
+  const [agentName, setAgentName] = useState<string>(template?.name ?? "My HQ Agent");
+  const [integrations, setIntegrations] = useState<Record<string, boolean>>(() => {
+    const base = Object.fromEntries(integrationsList.map((i) => [i.name, i.defaultOn])) as Record<string, boolean>;
+    if (template) {
+      // Auto-select integrations matching the template (case-insensitive)
+      for (const wanted of template.integrations) {
+        for (const integ of integrationsList) {
+          if (integ.name.toLowerCase() === wanted.toLowerCase()) {
+            base[integ.name] = true;
+          }
+        }
+      }
+    }
+    return base;
+  });
   const [channelState, setChannelState] = useState<Record<string, boolean>>(
     Object.fromEntries(channels.map((c) => [c.name, c.defaultOn]))
   );
@@ -51,7 +67,7 @@ export default function AgentDeployPage() {
     openai: false,
     gemini: false,
   });
-  const [systemPrompt, setSystemPrompt] = useState("");
+  const [systemPrompt, setSystemPrompt] = useState<string>(template?.systemPrompt ?? "");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importedFileName, setImportedFileName] = useState("");
   const navigate = useNavigate();
@@ -253,9 +269,25 @@ export default function AgentDeployPage() {
               {/* STEP 2 — Configure */}
               {step === 1 && (
                 <div className="space-y-4">
+                  {template && (
+                    <div className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg bg-success/10 border border-success/20">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <CheckCircle2 size={14} className="text-success shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-[11px] font-semibold text-success truncate">Template: {template.name}</p>
+                          <p className="text-[10px] text-muted-foreground">This template is pre-configured. Review and customize before deploying.</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div>
                     <label className="text-xs font-medium text-foreground block mb-1">Agent Name</label>
-                    <input defaultValue="My HQ Agent" placeholder="e.g. Email Manager, Social Publisher, Outreach Bot" className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50" />
+                    <input
+                      value={agentName}
+                      onChange={(e) => setAgentName(e.target.value)}
+                      placeholder="e.g. Email Manager, Social Publisher, Outreach Bot"
+                      className="w-full bg-background border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+                    />
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-1">
